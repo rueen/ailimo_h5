@@ -1,54 +1,26 @@
 <template>
   <app-layout>
-    <div class="equipment-page page-content">
+    <div class="equipment-page">
       <h2 class="page-title">设备租赁</h2>
 
       <van-form @submit="handleSubmit">
-        <!-- 设备选择 -->
         <van-cell-group inset>
+          <!-- 设备选择 -->
           <van-field
             v-model="equipmentName"
-            label="设备名称"
+            label="设备"
             placeholder="请选择设备"
             readonly
             is-link
             required
             @click="showEquipmentPicker = true"
           />
-          <van-field
-            v-if="form.equipment_id"
-            label="备注"
-            readonly
-          >
-            <template #input>
-              <div class="equipment-info">
-                <span>{{ equipmentInfo }}</span>
-                <van-button
-                  size="small"
-                  type="primary"
-                  plain
-                  @click="viewEquipmentDetail"
-                >
-                  查看设备详情
-                </van-button>
-              </div>
-            </template>
-          </van-field>
-        </van-cell-group>
+          <div class="equipment-detail-btn" @click="viewEquipmentDetail">
+            <span>查看设备详情</span>
+            <van-icon name="arrow" class="service-arrow" />
+          </div>
 
-        <!-- 时间选择 -->
-        <div v-if="form.equipment_id" class="time-picker-section">
-          <date-time-slot-picker
-            v-model="dateTimeValue"
-            :advance-days="advanceDays"
-            :show-remaining="true"
-            :multiple="true"
-            :fetch-slots="fetchTimeSlots"
-          />
-        </div>
-
-        <!-- 备注 -->
-        <van-cell-group inset>
+          <!-- 备注 -->
           <van-field
             v-model="form.remark"
             label="备注"
@@ -58,6 +30,17 @@
             maxlength="200"
             show-word-limit
           />
+
+          <!-- 时间选择 -->
+          <div v-if="form.equipment_id" class="time-picker-section">
+            <date-time-slot-picker
+              v-model="dateTimeValue"
+              :advance-days="advanceDays"
+              :show-remaining="true"
+              :multiple="true"
+              :fetch-slots="fetchTimeSlots"
+            />
+          </div>
         </van-cell-group>
 
         <!-- 提交按钮 -->
@@ -230,8 +213,10 @@ function onEquipmentConfirm({ selectedOptions }) {
  * 查看设备详情
  */
 function viewEquipmentDetail() {
-  if (form.value.equipment_id) {
+  if (form.value.equipment_id != null) {
     router.push(`/equipment/${form.value.equipment_id}`)
+  } else {
+    showToast('请选择设备')
   }
 }
 
@@ -292,6 +277,8 @@ onMounted(() => {
 
 <style lang="less" scoped>
 .equipment-page {
+  padding-top: @padding-md;
+
   .page-title {
     font-size: @font-size-xl;
     font-weight: 600;
@@ -299,6 +286,20 @@ onMounted(() => {
     
     @media (max-width: 767px) {
       display: none;
+    }
+  }
+
+  .equipment-detail-btn {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 5px;
+    font-size: @font-size-sm;
+    color: var(--text-color-3);
+    cursor: pointer;
+    margin: @padding-sm @padding-md @padding-sm 0;
+    &:hover {
+      color: var(--text-color);
     }
   }
 

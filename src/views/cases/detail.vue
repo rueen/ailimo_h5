@@ -33,7 +33,7 @@
 <script setup>
 import { ref, onMounted } from 'vue'
 import { useRoute } from 'vue-router'
-import { ImagePreview } from 'vant'
+import { showImagePreview } from 'vant'
 import AppLayout from '@/components/layout/AppLayout.vue'
 import { getCaseDetail } from '@/api/case'
 
@@ -53,7 +53,7 @@ async function loadCaseDetail() {
 }
 
 function previewImage(index) {
-  ImagePreview({
+  showImagePreview({
     images: caseDetail.value.images,
     startPosition: index
   })

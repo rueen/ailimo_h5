@@ -27,7 +27,7 @@
 </template>
 
 <script setup>
-import { computed } from 'vue'
+import { computed, inject } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { useUserStore } from '@/stores/user'
 
@@ -46,6 +46,11 @@ const props = defineProps({
 })
 
 /**
+ * 注入自定义标题（从子组件提供）
+ */
+const customTitle = inject('navBarTitle', null)
+
+/**
  * 是否为 PC 端
  */
 const isPc = computed(() => {
@@ -53,10 +58,12 @@ const isPc = computed(() => {
 })
 
 /**
- * 页面标题
+ * 页面标题（优先使用自定义标题，否则使用路由meta）
  */
 const pageTitle = computed(() => {
-  return route.meta.title || '艾力默'
+  // customTitle可能是ref，需要访问.value
+  const title = customTitle?.value ?? customTitle
+  return title || route.meta.title || '艾力默'
 })
 
 /**
