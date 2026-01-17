@@ -1,68 +1,335 @@
 <template>
   <app-layout>
     <div class="equipment-page page-content">
-      <van-search v-model="searchText" placeholder="搜索设备" @search="onSearch" />
-      
-      <van-loading v-if="loading" vertical>加载中...</van-loading>
-      
-      <div v-else-if="equipmentList.length > 0" class="equipment-list">
-        <van-card
-          v-for="item in equipmentList"
-          :key="item.id"
-          :title="item.name"
-          :desc="item.details?.base_info"
-          :thumb="item.details?.image?.[0]"
-          @click="router.push(`/equipment/${item.id}`)"
-        >
-          <template #footer>
-            <van-button size="small" type="primary" @click.stop="router.push(`/equipment/book/${item.id}`)">
-              立即预约
-            </van-button>
-          </template>
-        </van-card>
-      </div>
-      
-      <empty-state v-else description="暂无设备" />
+      <h2 class="page-title">设备租赁</h2>
+
+      <van-form @submit="handleSubmit">
+        <!-- 设备选择 -->
+        <van-cell-group inset>
+          <van-field
+            v-model="equipmentName"
+            label="设备名称"
+            placeholder="请选择设备"
+            readonly
+            is-link
+            required
+            @click="showEquipmentPicker = true"
+          />
+          <van-field
+            v-if="form.equipment_id"
+            label="备注"
+            readonly
+          >
+            <template #input>
+              <div class="equipment-info">
+                <span>{{ equipmentInfo }}</span>
+                <van-button
+                  size="small"
+                  type="primary"
+                  plain
+                  @click="viewEquipmentDetail"
+                >
+                  查看设备详情
+                </van-button>
+              </div>
+            </template>
+          </van-field>
+        </van-cell-group>
+
+        <!-- 时间选择 -->
+        <div v-if="form.equipment_id" class="time-picker-section">
+          <date-time-slot-picker
+            v-model="dateTimeValue"
+            :advance-days="advanceDays"
+            :show-remaining="true"
+            :multiple="true"
+            :fetch-slots="fetchTimeSlots"
+          />
+        </div>
+
+        <!-- 备注 -->
+        <van-cell-group inset>
+          <van-field
+            v-model="form.remark"
+            label="备注"
+            type="textarea"
+            placeholder="请输入备注信息（选填）"
+            rows="3"
+            maxlength="200"
+            show-word-limit
+          />
+        </van-cell-group>
+
+        <!-- 提交按钮 -->
+        <div class="submit-section">
+          <van-button
+            round
+            block
+            type="primary"
+            native-type="submit"
+            :loading="submitting"
+          >
+            提交预约
+          </van-button>
+        </div>
+      </van-form>
+
+      <!-- 设备选择弹窗 -->
+      <van-popup v-model:show="showEquipmentPicker" position="bottom" round>
+        <van-picker
+          :columns="equipmentColumns"
+          @confirm="onEquipmentConfirm"
+          @cancel="showEquipmentPicker = false"
+        />
+      </van-popup>
     </div>
   </app-layout>
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
+import { showToast, showSuccessToast } from 'vant'
 import AppLayout from '@/components/layout/AppLayout.vue'
-import EmptyState from '@/components/common/EmptyState.vue'
-import { getEquipmentList } from '@/api/equipment'
+import DateTimeSlotPicker from '@/components/common/DateTimeSlotPicker.vue'
+import { getEquipmentList, getEquipmentAvailableSlots, createEquipmentOrder } from '@/api/equipment'
+import { getAdvanceDays } from '@/api/common'
 
 const router = useRouter()
-const loading = ref(false)
-const equipmentList = ref([])
-const searchText = ref('')
 
+/**
+ * 表单数据
+ */
+const form = ref({
+  equipment_id: null,
+  reservation_date: '',
+  time_slots: [],
+  remark: ''
+})
+
+/**
+ * 日期时间选择器的值
+ */
+const dateTimeValue = ref({
+  date: '',
+  slots: []
+})
+
+/**
+ * 设备列表
+ */
+const equipmentList = ref([])
+
+/**
+ * 提前预约天数
+ */
+const advanceDays = ref(7)
+
+/**
+ * 显示设备选择器
+ */
+const showEquipmentPicker = ref(false)
+
+/**
+ * 提交状态
+ */
+const submitting = ref(false)
+
+/**
+ * 设备选择器列的数据
+ */
+const equipmentColumns = computed(() => {
+  return equipmentList.value.map(item => ({
+    text: item.name,
+    value: item.id,
+    details: item.details
+  }))
+})
+
+/**
+ * 选中的设备名称
+ */
+const equipmentName = computed(() => {
+  const equipment = equipmentList.value.find(item => item.id === form.value.equipment_id)
+  return equipment?.name || ''
+})
+
+/**
+ * 设备信息
+ */
+const equipmentInfo = computed(() => {
+  const equipment = equipmentList.value.find(item => item.id === form.value.equipment_id)
+  return equipment?.details?.base_info || ''
+})
+
+/**
+ * 加载设备列表
+ */
 async function loadEquipmentList() {
   try {
-    loading.value = true
-    equipmentList.value = await getEquipmentList({ name: searchText.value })
+    equipmentList.value = await getEquipmentList()
   } catch (error) {
     console.error('加载设备列表失败:', error)
-  } finally {
-    loading.value = false
+    showToast('加载设备列表失败')
   }
 }
 
-function onSearch() {
-  loadEquipmentList()
+/**
+ * 加载提前预约天数配置
+ */
+async function loadAdvanceDays() {
+  try {
+    const data = await getAdvanceDays()
+    advanceDays.value = data.equipment_advance_days || 7
+  } catch (error) {
+    console.error('加载配置失败:', error)
+  }
 }
 
+/**
+ * 获取时间段数据（供DateTimeSlotPicker组件调用）
+ * @param {string} date - 日期
+ */
+async function fetchTimeSlots(date) {
+  if (!form.value.equipment_id) {
+    return []
+  }
+  
+  try {
+    const slots = await getEquipmentAvailableSlots(form.value.equipment_id, { date })
+    
+    // 计算剩余数量（假设每个时间段只能预约1次，根据available判断）
+    return slots.map(slot => ({
+      ...slot,
+      remaining: slot.available ? 1 : 0
+    }))
+  } catch (error) {
+    console.error('加载时间段失败:', error)
+    throw error
+  }
+}
+
+/**
+ * 设备选择确认
+ * @param {object} value - 选中的值
+ */
+function onEquipmentConfirm({ selectedOptions }) {
+  const selected = selectedOptions[0]
+  form.value.equipment_id = selected.value
+  
+  // 清空之前选择的时间
+  dateTimeValue.value = {
+    date: '',
+    slots: []
+  }
+  
+  showEquipmentPicker.value = false
+}
+
+/**
+ * 查看设备详情
+ */
+function viewEquipmentDetail() {
+  if (form.value.equipment_id) {
+    router.push(`/equipment/${form.value.equipment_id}`)
+  }
+}
+
+/**
+ * 提交表单
+ */
+async function handleSubmit() {
+  // 验证设备
+  if (!form.value.equipment_id) {
+    showToast('请选择设备')
+    return
+  }
+
+  // 验证日期
+  if (!dateTimeValue.value.date) {
+    showToast('请选择预约日期')
+    return
+  }
+
+  // 验证时间段
+  if (!dateTimeValue.value.slots || dateTimeValue.value.slots.length === 0) {
+    showToast('请至少选择一个时间段')
+    return
+  }
+
+  // 组装提交数据
+  const submitData = {
+    equipment_id: form.value.equipment_id,
+    reservation_date: dateTimeValue.value.date,
+    time_slots: dateTimeValue.value.slots.map(slot => slot.display_time),
+    remark: form.value.remark
+  }
+
+  try {
+    submitting.value = true
+    await createEquipmentOrder(submitData)
+    showSuccessToast('提交成功，请等待审核')
+    
+    // 跳转到订单列表
+    setTimeout(() => {
+      router.push('/orders')
+    }, 1500)
+  } catch (error) {
+    console.error('提交订单失败:', error)
+  } finally {
+    submitting.value = false
+  }
+}
+
+/**
+ * 组件挂载时加载数据
+ */
 onMounted(() => {
   loadEquipmentList()
+  loadAdvanceDays()
 })
 </script>
 
 <style lang="less" scoped>
-.equipment-list {
-  display: flex;
-  flex-direction: column;
-  gap: @padding-md;
+.equipment-page {
+  .page-title {
+    font-size: @font-size-xl;
+    font-weight: 600;
+    margin-bottom: @padding-lg;
+    
+    @media (max-width: 767px) {
+      display: none;
+    }
+  }
+
+  .equipment-info {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: @padding-sm;
+    width: 100%;
+
+    span {
+      flex: 1;
+      font-size: @font-size-sm;
+      color: var(--text-color-3);
+    }
+  }
+
+  .time-picker-section {
+    margin: @padding-lg 0;
+    padding: @padding-md;
+    background-color: var(--bg-color-white);
+    border-radius: @border-radius-md;
+  }
+
+  .submit-section {
+    margin-top: @padding-xl;
+    padding: 0 @padding-md;
+  }
+
+  :deep(.van-cell-group) {
+    margin-bottom: @padding-md;
+  }
 }
 </style>

@@ -72,19 +72,13 @@ const routes = [
     path: '/equipment',
     name: 'Equipment',
     component: () => import('@/views/equipment/index.vue'),
-    meta: { title: '设备租赁', requiresAuth: false }
+    meta: { title: '设备租赁', requiresAuth: true, requiresAudit: true }
   },
   {
     path: '/equipment/:id',
     name: 'EquipmentDetail',
     component: () => import('@/views/equipment/detail.vue'),
     meta: { title: '设备详情', requiresAuth: false }
-  },
-  {
-    path: '/equipment/book/:id',
-    name: 'EquipmentBook',
-    component: () => import('@/views/equipment/book.vue'),
-    meta: { title: '预约设备', requiresAuth: true, requiresAudit: true }
   },
   {
     path: '/cage',
@@ -156,15 +150,22 @@ router.beforeEach((to, from, next) => {
     }
 
     // 需要审核通过的页面
-    if (to.meta.requiresAudit && !userStore.isAuditPassed()) {
-      if (userStore.needAudit()) {
-        showToast('账号审核中，请等待审核通过')
-        next('/audit-status')
-      } else if (userStore.isAuditRejected()) {
-        showToast('账号审核未通过')
-        next('/audit-status')
+    if (to.meta.requiresAudit) {
+      if (!userStore.isAuditPassed()) {
+        if (userStore.needAudit()) {
+          showToast('账号审核中，请等待审核通过')
+          next('/audit-status')
+          return
+        } else if (userStore.isAuditRejected()) {
+          showToast('账号审核未通过')
+          next('/audit-status')
+          return
+        }
+        // 如果审核状态异常，跳转到个人中心
+        showToast('账号审核状态异常')
+        next('/my')
+        return
       }
-      return
     }
   }
 
