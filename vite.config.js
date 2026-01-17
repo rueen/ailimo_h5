@@ -1,3 +1,11 @@
+/*
+ * @Author: diaochan diaochan@seatent.com
+ * @Date: 2026-01-17 19:10:50
+ * @LastEditors: diaochan diaochan@seatent.com
+ * @LastEditTime: 2026-01-17 20:19:07
+ * @FilePath: /ailimo_h5/vite.config.js
+ * @Description: 这是默认设置,请设置`customMade`, 打开koroFileHeader查看配置 进行设置: https://github.com/OBKoro1/koro1FileHeader/wiki/%E9%85%8D%E7%BD%AE
+ */
 import { defineConfig } from 'vite'
 import vue from '@vitejs/plugin-vue'
 import Components from 'unplugin-vue-components/vite'
@@ -33,7 +41,7 @@ export default defineConfig({
   
   // 开发服务器配置
   server: {
-    port: 5173,
+    port: 3002,
     host: true,
     open: true,
     // 配置代理，解决跨域问题
