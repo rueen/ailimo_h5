@@ -1,6 +1,6 @@
 <template>
   <app-layout>
-    <div class="orders-page page-content">
+    <div class="orders-page">
       <h2 class="page-title">我的订单</h2>
 
       <van-list
@@ -9,17 +9,29 @@
         finished-text="没有更多了"
         @load="onLoad"
       >
-        <van-card
+        <div
           v-for="order in orderList"
           :key="`${order.type}-${order.id}`"
-          :title="order.title"
-          :desc="`${order.type_name} | ${order.date}`"
+          class="order-card"
           @click="goDetail(order)"
         >
-          <template #tags>
-            <van-tag :type="getStatusType(order.status)">{{ order.status_text }}</van-tag>
-          </template>
-        </van-card>
+          <div class="order-header">
+            <div class="order-title">
+              <span class="order-type">{{ order.type_name }}</span>
+              <van-tag :type="getStatusType(order.status)" class="order-status">
+                {{ order.status_text }}
+              </van-tag>
+            </div>
+            <div class="order-date">{{ order.date }}</div>
+          </div>
+          
+          <div class="order-content">
+            <div class="order-info">
+              <div class="order-title-text">{{ order.title }}</div>
+            </div>
+            <van-icon name="arrow" class="order-arrow" />
+          </div>
+        </div>
       </van-list>
 
       <empty-state v-if="!loading && orderList.length === 0" description="暂无订单" />
@@ -115,18 +127,86 @@ function goDetail(order) {
 
 <style lang="less" scoped>
 .orders-page {
+  background-color: var(--bg-color);
+  padding: @padding-md;
+
   .page-title {
     font-size: @font-size-xl;
     font-weight: 600;
     margin-bottom: @padding-lg;
+    color: var(--text-color);
+
+    @media (max-width: 767px) {
+      display: none;
+    }
   }
-  
-  .van-card {
+
+  .order-card {
+    background-color: var(--bg-color-white);
+    border-radius: @border-radius-md;
+    padding: @padding-md;
     margin-bottom: @padding-md;
     cursor: pointer;
-    
+    transition: all 0.3s;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+
     &:hover {
-      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+      transform: translateY(-2px);
+    }
+
+    &:active {
+      transform: translateY(0);
+    }
+
+    .order-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: @padding-sm;
+
+      .order-title {
+        display: flex;
+        align-items: center;
+        gap: @padding-sm;
+        flex: 1;
+
+        .order-type {
+          font-size: @font-size-md;
+          font-weight: 600;
+          color: var(--text-color);
+        }
+      }
+
+      .order-date {
+        font-size: @font-size-sm;
+        color: var(--text-color-3);
+        white-space: nowrap;
+      }
+    }
+
+    .order-content {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: @padding-sm;
+
+      .order-info {
+        flex: 1;
+        min-width: 0;
+
+        .order-title-text {
+          font-size: @font-size-sm;
+          color: var(--text-color-2);
+          .ellipsis();
+        }
+      }
+
+      .order-arrow {
+        color: var(--text-color-4);
+        font-size: 16px;
+        flex-shrink: 0;
+      }
     }
   }
 }
