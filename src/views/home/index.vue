@@ -62,18 +62,19 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted } from 'vue'
+import { computed } from 'vue'
 import { useRouter } from 'vue-router'
 import AppLayout from '@/components/layout/AppLayout.vue'
 import ServiceCard from '@/components/common/ServiceCard.vue'
-import { getCompanyInfo } from '@/api/company'
+import { useCompanyStore } from '@/stores/company'
 
 const router = useRouter()
+const companyStore = useCompanyStore()
 
 /**
- * 公司信息
+ * 公司信息（从 store 获取，无需重复请求）
  */
-const companyInfo = ref(null)
+const companyInfo = computed(() => companyStore.companyInfo)
 
 /**
  * Banner 图片
@@ -156,21 +157,6 @@ const isPc = computed(() => {
 function goServices() {
   router.push('/services')
 }
-
-/**
- * 加载公司信息
- */
-async function loadCompanyInfo() {
-  try {
-    companyInfo.value = await getCompanyInfo()
-  } catch (error) {
-    console.error('加载公司信息失败:', error)
-  }
-}
-
-onMounted(() => {
-  loadCompanyInfo()
-})
 </script>
 
 <style lang="less" scoped>

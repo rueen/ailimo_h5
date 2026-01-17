@@ -35,8 +35,8 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
-import { getCompanyInfo } from '@/api/company'
+import { computed } from 'vue'
+import { useCompanyStore } from '@/stores/company'
 
 /**
  * Logo 地址
@@ -44,24 +44,10 @@ import { getCompanyInfo } from '@/api/company'
 const logoUrl = 'https://ailimolab.oss-cn-hangzhou.aliyuncs.com/images/h5/logo.png'
 
 /**
- * 公司信息
+ * 公司信息（从 store 获取，无需重复请求）
  */
-const companyInfo = ref(null)
-
-/**
- * 加载公司信息
- */
-async function loadCompanyInfo() {
-  try {
-    companyInfo.value = await getCompanyInfo()
-  } catch (error) {
-    console.error('加载公司信息失败:', error)
-  }
-}
-
-onMounted(() => {
-  loadCompanyInfo()
-})
+const companyStore = useCompanyStore()
+const companyInfo = computed(() => companyStore.companyInfo)
 </script>
 
 <style lang="less" scoped>

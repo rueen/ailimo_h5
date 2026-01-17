@@ -36,27 +36,21 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
+import { computed } from 'vue'
 import AppLayout from '@/components/layout/AppLayout.vue'
-import { getCompanyInfo } from '@/api/company'
+import { useCompanyStore } from '@/stores/company'
 
-const loading = ref(true)
-const companyInfo = ref(null)
+const companyStore = useCompanyStore()
 
-async function loadCompanyInfo() {
-  try {
-    loading.value = true
-    companyInfo.value = await getCompanyInfo()
-  } catch (error) {
-    console.error('加载公司信息失败:', error)
-  } finally {
-    loading.value = false
-  }
-}
+/**
+ * 加载状态（从 store 获取）
+ */
+const loading = computed(() => companyStore.loading && !companyStore.loaded)
 
-onMounted(() => {
-  loadCompanyInfo()
-})
+/**
+ * 公司信息（从 store 获取，无需重复请求）
+ */
+const companyInfo = computed(() => companyStore.companyInfo)
 </script>
 
 <style lang="less" scoped>
