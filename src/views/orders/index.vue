@@ -1,17 +1,9 @@
 <template>
   <app-layout>
     <div class="orders-page page-content">
-      <van-tabs v-model:active="activeTab" @change="onTabChange">
-        <van-tab title="全部" name="all" />
-        <van-tab title="待审核" name="0" />
-        <van-tab title="进行中" name="1" />
-        <van-tab title="已完成" name="3" />
-      </van-tabs>
-
-      <van-loading v-if="loading" vertical>加载中...</van-loading>
+      <h2 class="page-title">我的订单</h2>
 
       <van-list
-        v-else
         v-model:loading="loading"
         :finished="finished"
         finished-text="没有更多了"
@@ -36,7 +28,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref } from 'vue'
 import { useRouter } from 'vue-router'
 import AppLayout from '@/components/layout/AppLayout.vue'
 import EmptyState from '@/components/common/EmptyState.vue'
@@ -45,72 +37,97 @@ import { getMyOrders } from '@/api/order'
 const router = useRouter()
 const loading = ref(false)
 const finished = ref(false)
-const activeTab = ref('all')
 const orderList = ref([])
-const page = ref(1)
+const page = ref(0)
+const pageSize = 10
 
+/**
+ * 获取订单状态对应的标签类型
+ * @param {number} status - 订单状态
+ * @returns {string} 标签类型
+ */
 function getStatusType(status) {
   const typeMap = {
-    0: 'warning',
-    1: 'primary',
-    2: 'danger',
-    3: 'success',
-    4: 'default'
+    0: 'warning',  // 待审核
+    1: 'primary',  // 进行中
+    2: 'danger',   // 已拒绝
+    3: 'success',  // 已完成
+    4: 'default'   // 已取消
   }
   return typeMap[status] || 'default'
 }
 
+/**
+ * 加载订单列表
+ */
 async function loadOrders() {
   try {
-    loading.value = true
     const params = {
       page: page.value,
-      page_size: 10
+      page_size: pageSize
     }
-    if (activeTab.value !== 'all') {
-      params.status = Number(activeTab.value)
-    }
+    
     const data = await getMyOrders(params)
+    
+    // 检查返回的数据
+    const list = data.list || []
+    
     if (page.value === 1) {
-      orderList.value = data.list
+      orderList.value = list
     } else {
-      orderList.value.push(...data.list)
+      orderList.value.push(...list)
     }
-    finished.value = orderList.value.length >= data.total
+    
+    // 判断是否加载完成：
+    // 1. 如果返回的数据少于 pageSize，说明没有更多数据了
+    // 2. 如果总数已知，判断已加载数量是否达到总数
+    if (list.length < pageSize) {
+      finished.value = true
+    } else if (data.total !== undefined) {
+      finished.value = orderList.value.length >= data.total
+    }
+    
+    loading.value = false
   } catch (error) {
     console.error('加载订单失败:', error)
-  } finally {
+    // 发生错误时也要停止加载，避免无限请求
+    finished.value = true
     loading.value = false
   }
 }
 
+/**
+ * van-list 组件的 load 事件处理
+ */
 function onLoad() {
   page.value++
   loadOrders()
 }
 
-function onTabChange() {
-  page.value = 1
-  orderList.value = []
-  finished.value = false
-  loadOrders()
-}
-
+/**
+ * 跳转到订单详情
+ * @param {object} order - 订单对象
+ */
 function goDetail(order) {
   router.push(`/orders/${order.type}/${order.id}`)
 }
-
-onMounted(() => {
-  loadOrders()
-})
 </script>
 
 <style lang="less" scoped>
 .orders-page {
-  padding-top: 0;
+  .page-title {
+    font-size: @font-size-xl;
+    font-weight: 600;
+    margin-bottom: @padding-lg;
+  }
   
   .van-card {
     margin-bottom: @padding-md;
+    cursor: pointer;
+    
+    &:hover {
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    }
   }
 }
 </style>

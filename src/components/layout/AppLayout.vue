@@ -1,7 +1,10 @@
 <template>
-  <div class="app-layout" :class="{ 'has-tabbar': showTabbar }">
-    <!-- 头部 -->
-    <app-header v-if="showHeader" />
+  <div class="app-layout" :class="{ 'has-tabbar': showTabbar, 'is-pc': isPc }">
+    <!-- PC 端头部 -->
+    <app-header v-if="showHeader && isPc" />
+
+    <!-- 移动端导航栏 -->
+    <app-nav-bar v-if="!isPc && showNavBar" :show-nav-bar="showNavBar" />
 
     <!-- 主内容区 -->
     <div class="app-main">
@@ -20,6 +23,7 @@
 import { computed } from 'vue'
 import { useRoute } from 'vue-router'
 import AppHeader from './AppHeader.vue'
+import AppNavBar from './AppNavBar.vue'
 import AppTabbar from './AppTabbar.vue'
 import AppFooter from './AppFooter.vue'
 
@@ -30,6 +34,10 @@ const route = useRoute()
  */
 const props = defineProps({
   showHeader: {
+    type: Boolean,
+    default: true
+  },
+  showNavBar: {
     type: Boolean,
     default: true
   }
