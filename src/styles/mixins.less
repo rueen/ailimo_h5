@@ -1,0 +1,77 @@
+/**
+ * Less Mixins 混合宏定义
+ * 这些 mixin 会被全局注入，可以在任何组件的 style 标签中直接使用
+ */
+
+/**
+ * 单行文本溢出省略
+ */
+.ellipsis() {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/**
+ * 两行文本溢出省略
+ */
+.ellipsis-2() {
+  display: -webkit-box;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+}
+
+/**
+ * 三行文本溢出省略
+ */
+.ellipsis-3() {
+  display: -webkit-box;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+}
+
+/**
+ * 多行文本溢出省略
+ * @lines: 显示的行数
+ */
+.ellipsis-lines(@lines) {
+  display: -webkit-box;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  -webkit-line-clamp: @lines;
+  -webkit-box-orient: vertical;
+}
+
+/**
+ * 清除浮动
+ */
+.clearfix() {
+  &::after {
+    content: '';
+    display: block;
+    clear: both;
+  }
+}
+
+/**
+ * 绝对居中
+ */
+.absolute-center() {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
+/**
+ * Flex 居中
+ */
+.flex-center() {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
