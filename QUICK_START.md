@@ -65,7 +65,7 @@ server: {
 主题颜色在 `src/styles/variables.less` 中配置:
 
 ```less
-@primary-color: #07C160;  // 主题绿色
+@primary-color: #00e9aa;  // 主题绿色
 ```
 
 ## 📝 测试账号

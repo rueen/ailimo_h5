@@ -32,8 +32,8 @@
         </div>
       </div>
 
-      <!-- 视频展示（PC端） -->
-      <div v-if="isPc && companyInfo?.video_url" class="home-video">
+      <!-- 视频展示 -->
+      <div v-if="companyInfo?.video_url" class="home-video">
         <h2 class="section-title">视频展示</h2>
         <div class="video-container">
           <video
@@ -213,19 +213,30 @@ function goServices() {
 
   .home-services {
     padding: 20px 16px;
-    background-color: var(--bg-color-white);
 
     .services-grid {
       display: grid;
       grid-template-columns: 1fr;
-      gap: 16px;
-
+      gap: 20px;
+      max-width: 1200px;
+      margin: 0 auto;
+      
       @media (min-width: 768px) {
-        grid-template-columns: repeat(2, 1fr);
+        grid-template-columns: repeat(1, 1fr);
+      }
+
+      @media (min-width: 992px) {
+        grid-template-columns: repeat(3, 1fr);
       }
 
       @media (min-width: 1200px) {
-        grid-template-columns: repeat(3, 1fr);
+        grid-template-columns: repeat(5, 1fr);
+      }
+      .service-card {
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        text-align: center;
       }
     }
   }
