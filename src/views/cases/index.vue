@@ -124,7 +124,7 @@ function onLoad() {
 
   .case-image {
     width: 100%;
-    aspect-ratio: 4 / 3;
+    aspect-ratio: 16 / 9;
     background: #fcfcfc;
     overflow: hidden;
   }
