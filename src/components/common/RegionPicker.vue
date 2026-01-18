@@ -83,23 +83,13 @@ const selectedNames = ref({
 /**
  * Picker 的列配置
  */
-const columns = computed(() => [
-  {
-    values: provinces.value,
-    className: 'column-province',
-    defaultIndex: 0
-  },
-  {
-    values: cities.value,
-    className: 'column-city',
-    defaultIndex: 0
-  },
-  {
-    values: districts.value,
-    className: 'column-district',
-    defaultIndex: 0
-  }
-])
+const columns = computed(() => {
+  return [
+    provinces.value,
+    cities.value,
+    districts.value
+  ]
+})
 
 /**
  * 显示的地区文本
@@ -186,22 +176,20 @@ async function loadDistricts(cityId) {
 
 /**
  * Picker 改变事件
- * @param {object} picker - Picker 实例
- * @param {array} values - 当前选中的值
- * @param {number} index - 改变的列索引
+ * @param {object} param - 包含 columnIndex、selectedValues 和 selectedOptions
  */
-async function onChange({ columnIndex, selectedValues }) {
+async function onChange({ columnIndex, selectedOptions }) {
   if (columnIndex === 0) {
     // 省份改变，重新加载城市和区县
-    const provinceId = selectedValues[0]
-    if (provinceId) {
-      await loadCities(provinceId)
+    const province = selectedOptions[0]
+    if (province && province.value) {
+      await loadCities(province.value)
     }
   } else if (columnIndex === 1) {
     // 城市改变，重新加载区县
-    const cityId = selectedValues[1]
-    if (cityId) {
-      await loadDistricts(cityId)
+    const city = selectedOptions[1]
+    if (city && city.value) {
+      await loadDistricts(city.value)
     }
   }
 }
