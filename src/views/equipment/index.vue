@@ -76,9 +76,10 @@ import { showToast, showSuccessToast } from 'vant'
 import AppLayout from '@/components/layout/AppLayout.vue'
 import DateTimeSlotPicker from '@/components/common/DateTimeSlotPicker.vue'
 import { getEquipmentList, getEquipmentAvailableSlots, createEquipmentOrder } from '@/api/equipment'
-import { getAdvanceDays } from '@/api/common'
+import { useConfigStore } from '@/stores/config'
 
 const router = useRouter()
+const configStore = useConfigStore()
 
 /**
  * 表单数据
@@ -104,9 +105,11 @@ const dateTimeValue = ref({
 const equipmentList = ref([])
 
 /**
- * 提前预约天数
+ * 提前预约天数（从全局配置获取）
  */
-const advanceDays = ref(7)
+const advanceDays = computed(() => {
+  return configStore.advanceDays.equipment_advance_days || 7
+})
 
 /**
  * 显示设备选择器
@@ -154,18 +157,6 @@ async function loadEquipmentList() {
   } catch (error) {
     console.error('加载设备列表失败:', error)
     showToast('加载设备列表失败')
-  }
-}
-
-/**
- * 加载提前预约天数配置
- */
-async function loadAdvanceDays() {
-  try {
-    const data = await getAdvanceDays()
-    advanceDays.value = data.equipment_advance_days || 7
-  } catch (error) {
-    console.error('加载配置失败:', error)
   }
 }
 
@@ -271,7 +262,6 @@ async function handleSubmit() {
  */
 onMounted(() => {
   loadEquipmentList()
-  loadAdvanceDays()
 })
 </script>
 
