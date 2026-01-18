@@ -245,7 +245,7 @@ function goServices() {
     padding: 0 @padding-md;
 
     .video-container {
-      max-width: 1200px;
+      max-width: 1000px;
       margin: 0 auto;
 
       video {
