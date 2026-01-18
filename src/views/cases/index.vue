@@ -9,18 +9,20 @@
         finished-text="没有更多了"
         @load="onLoad"
       >
-        <div
-          class="case-item"
-          v-for="(item, index) in caseList"
-          :key="index"
-          @click="router.push(`/cases/${item.id}`)"
-        >
-          <div class="case-image">
-            <van-image :src="item.images?.[0]" alt="案例图片" fit="cover" />
-          </div>
-          <div class="case-content">
-            <h3 class="case-title">{{ item.project_name }}</h3>
-            <p class="case-desc">{{ item.project_summary }}</p>
+        <div class="case-grid">
+          <div
+            class="case-item"
+            v-for="(item, index) in caseList"
+            :key="item.id ?? index"
+            @click="router.push(`/cases/${item.id}`)"
+          >
+            <div class="case-image">
+              <van-image :src="item.images?.[0]" alt="案例图片" fit="cover" />
+            </div>
+            <div class="case-content">
+              <h3 class="case-title">{{ item.project_name }}</h3>
+              <p class="case-desc">{{ item.project_summary }}</p>
+            </div>
           </div>
         </div>
       </van-list>
@@ -95,6 +97,16 @@ function onLoad() {
     margin-bottom: @padding-lg;
   }
 
+  /* 多列网格：移动端 2 列，平板 3 列 */
+  .case-grid {
+    display: grid;
+    grid-template-columns: repeat(1, 1fr);
+    gap: @padding-md;
+    @media (min-width: 768px) {
+      grid-template-columns: repeat(3, 1fr);
+    }
+  }
+
   .case-item {
     background: #fff;
     border-radius: 12px;
@@ -112,28 +124,36 @@ function onLoad() {
 
   .case-image {
     width: 100%;
-    height: 200px;
+    aspect-ratio: 4 / 3;
     background: #fcfcfc;
     overflow: hidden;
   }
 
   .case-content {
-    padding: 20px;
+    padding: @padding-sm @padding-md;
   }
 
   .case-title {
-    font-size: 18px;
+    font-size: @font-size-md;
     font-weight: 600;
     color: @text-color;
-    margin-bottom: 12px;
+    margin-bottom: 4px;
     line-height: 1.4;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
   }
 
   .case-desc {
-    font-size: 14px;
+    font-size: @font-size-sm;
     color: @text-color-2;
-    line-height: 1.6;
-    margin-bottom: 16px;
+    line-height: 1.5;
+    display: -webkit-box;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    -webkit-line-clamp: 2;
+    line-clamp: 2;
+    -webkit-box-orient: vertical;
   }
 }
 </style>
