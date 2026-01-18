@@ -4,9 +4,9 @@
       <van-loading v-if="loading" vertical>加载中...</van-loading>
 
       <div v-else-if="caseDetail" class="case-detail">
-        <h2>{{ caseDetail.project_name }}</h2>
 
         <div v-if="caseDetail.images?.length" class="case-images">
+          <!-- 案例图片 -->
           <van-image
             v-for="(img, index) in caseDetail.images"
             :key="index"
@@ -15,6 +15,8 @@
             @click="previewImage(index)"
           />
         </div>
+
+        <h1 class="case-title">{{ caseDetail.project_name }}</h1>
 
         <div class="case-section">
           <h3>项目概述</h3>
@@ -31,7 +33,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, provide } from 'vue'
 import { useRoute } from 'vue-router'
 import { showImagePreview } from 'vant'
 import AppLayout from '@/components/layout/AppLayout.vue'
@@ -40,11 +42,23 @@ import { getCaseDetail } from '@/api/case'
 const route = useRoute()
 const loading = ref(false)
 const caseDetail = ref(null)
+const navBarTitle = ref('案例详情')
+/**
+ * 提供导航栏标题给AppNavBar组件
+ */
+provide('navBarTitle', navBarTitle)
 
 async function loadCaseDetail() {
   try {
     loading.value = true
     caseDetail.value = await getCaseDetail(route.params.id)
+
+    // 更新导航栏标题为设备名称
+    if (caseDetail.value?.project_name) {
+      navBarTitle.value = caseDetail.value.project_name
+      // 同时更新页面标题
+      document.title = caseDetail.value.project_name + ' - 案例详情'
+    }
   } catch (error) {
     console.error('加载案例详情失败:', error)
   } finally {
@@ -66,6 +80,9 @@ onMounted(() => {
 
 <style lang="less" scoped>
 .case-detail {
+  background-color: #fff;
+  padding: @padding-md;
+  border-radius: @border-radius-md;
   h2 {
     font-size: @font-size-xl;
     font-weight: 600;
@@ -74,16 +91,23 @@ onMounted(() => {
 
   .case-images {
     display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: @padding-sm;
+    grid-template-columns: repeat(1, 1fr);
     margin-bottom: @padding-lg;
 
     :deep(.van-image) {
       width: 100%;
-      height: 120px;
-      border-radius: @border-radius-md;
-      overflow: hidden;
+      height: auto;
     }
+  }
+
+  .case-title {
+    font-size: @font-size-xl;
+    font-weight: 600;
+    color: @text-color;
+    margin-bottom: @padding-lg;
+    line-height: 1.4;
+    padding-bottom: @padding-lg;
+    border-bottom: 1px solid @border-color;
   }
 
   .case-section {
@@ -96,7 +120,7 @@ onMounted(() => {
     }
 
     p {
-      color: var(--text-color-2);
+      color: @text-color-2;
       line-height: 1.8;
       white-space: pre-wrap;
     }

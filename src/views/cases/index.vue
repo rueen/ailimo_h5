@@ -9,14 +9,20 @@
         finished-text="没有更多了"
         @load="onLoad"
       >
-        <van-card
-          v-for="item in caseList"
-          :key="item.id"
-          :title="item.project_name"
-          :desc="item.project_summary"
-          :thumb="item.images?.[0]"
+        <div
+          class="case-item"
+          v-for="(item, index) in caseList"
+          :key="index"
           @click="router.push(`/cases/${item.id}`)"
-        />
+        >
+          <div class="case-image">
+            <van-image :src="item.images?.[0]" alt="案例图片" fit="cover" />
+          </div>
+          <div class="case-content">
+            <h3 class="case-title">{{ item.project_name }}</h3>
+            <p class="case-desc">{{ item.project_summary }}</p>
+          </div>
+        </div>
       </van-list>
 
       <empty-state v-if="!loading && caseList.length === 0" description="暂无案例" />
@@ -89,8 +95,45 @@ function onLoad() {
     margin-bottom: @padding-lg;
   }
 
-  .van-card {
-    margin-bottom: @padding-md;
+  .case-item {
+    background: #fff;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+    transition: transform 0.3s, box-shadow 0.3s;
+    cursor: pointer;
+    border-radius: @border-radius-md;
+  }
+
+  .case-item:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+  }
+
+  .case-image {
+    width: 100%;
+    height: 200px;
+    background: #fcfcfc;
+    overflow: hidden;
+  }
+
+  .case-content {
+    padding: 20px;
+  }
+
+  .case-title {
+    font-size: 18px;
+    font-weight: 600;
+    color: @text-color;
+    margin-bottom: 12px;
+    line-height: 1.4;
+  }
+
+  .case-desc {
+    font-size: 14px;
+    color: @text-color-2;
+    line-height: 1.6;
+    margin-bottom: 16px;
   }
 }
 </style>
