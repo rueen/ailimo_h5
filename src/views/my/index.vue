@@ -1,15 +1,23 @@
+<!--
+ * @Author: diaochan diaochan@seatent.com
+ * @Date: 2026-01-17 19:16:48
+ * @LastEditors: diaochan diaochan@seatent.com
+ * @LastEditTime: 2026-01-18 20:34:59
+ * @FilePath: /ailimo_h5/src/views/my/index.vue
+ * @Description: 这是默认设置,请设置`customMade`, 打开koroFileHeader查看配置 进行设置: https://github.com/OBKoro1/koro1FileHeader/wiki/%E9%85%8D%E7%BD%AE
+-->
 <template>
   <app-layout>
     <div class="my-page page-content">
       <div class="user-header">
-        <van-icon name="user-circle-o" size="64" color="#07C160" />
+        <van-icon name="user-circle-o" size="48" color="#07C160" />
         <div class="user-info">
           <h3>{{ userStore.userInfo?.name }}</h3>
           <p>{{ userStore.userInfo?.phone }}</p>
         </div>
       </div>
 
-      <van-cell-group inset>
+      <van-cell-group>
         <van-cell title="用户编号" :value="userStore.userInfo?.user_no" />
         <van-cell title="组织机构" :value="userStore.userInfo?.organization?.name" />
         <van-cell title="课题组" :value="userStore.userInfo?.research_group?.name" />
@@ -21,7 +29,7 @@
         <van-cell v-if="userStore.userInfo?.address" title="详细地址" :label="userStore.userInfo.address" />
       </van-cell-group>
 
-      <van-cell-group inset style="margin-top: 16px;">
+      <van-cell-group style="margin-top: 16px;">
         <van-cell title="我的订单" is-link @click="router.push('/orders')" />
         <van-cell title="审核状态" is-link @click="router.push('/audit-status')" />
       </van-cell-group>

@@ -1,6 +1,6 @@
 <template>
   <app-layout>
-    <div class="orders-page">
+    <div class="orders-page page-content">
       <h2 class="page-title">我的订单</h2>
 
       <van-list
