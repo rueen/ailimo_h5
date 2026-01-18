@@ -2,7 +2,7 @@
  * @Author: diaochan diaochan@seatent.com
  * @Date: 2026-01-17 20:30:30
  * @LastEditors: diaochan diaochan@seatent.com
- * @LastEditTime: 2026-01-17 20:33:39
+ * @LastEditTime: 2026-01-18 19:25:33
  * @FilePath: /ailimo_h5/src/components/layout/AppNavBar.vue
  * @Description: 这是默认设置,请设置`customMade`, 打开koroFileHeader查看配置 进行设置: https://github.com/OBKoro1/koro1FileHeader/wiki/%E9%85%8D%E7%BD%AE
 -->
@@ -99,6 +99,7 @@ function goMy() {
 
 <style lang="less" scoped>
 :deep(.van-nav-bar) {
+  z-index: 100;
   background-color: var(--bg-color-white);
   
   .van-nav-bar__title {

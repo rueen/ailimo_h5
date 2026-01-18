@@ -207,12 +207,12 @@ function goServices() {
     font-size: 28px;
     font-weight: 600;
     text-align: center;
-    margin: 40px 0 24px;
+    margin: 40px 0 20px 0;
     color: var(--text-color);
   }
 
   .home-services {
-    padding: 20px 16px;
+    padding: 0 @padding-md;
 
     .services-grid {
       display: grid;
@@ -242,7 +242,7 @@ function goServices() {
   }
 
   .home-video {
-    padding: 20px 16px;
+    padding: 0 @padding-md;
 
     .video-container {
       max-width: 800px;
@@ -256,12 +256,12 @@ function goServices() {
   }
 
   .home-advantages {
-    padding: 20px 16px;
+    padding: 0 @padding-md;
 
     .advantages-grid {
       display: grid;
       grid-template-columns: 1fr;
-      gap: 20px;
+      gap: @padding-md;
       max-width: 1200px;
       margin: 0 auto;
 
