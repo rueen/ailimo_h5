@@ -2,58 +2,385 @@
   <app-layout>
     <div class="experiment-page page-content">
       <h2 class="page-title">实验代操作</h2>
-      <van-form @submit="handleSubmit">
+      
+      <van-form @submit="handleSubmit" ref="formRef">
         <van-cell-group inset>
-          <van-field v-model="formData.operation_content_id" label="操作内容" placeholder="选择操作内容" />
-          <van-field v-model="formData.animal_type_id" label="动物类型" placeholder="选择动物类型" />
-          <van-field v-model="formData.quantity" type="number" label="动物数量" placeholder="请输入数量" />
-          <van-field v-model="formData.reservation_date" label="预约日期" placeholder="选择日期" />
-          <van-field v-model="formData.remark" type="textarea" label="备注" placeholder="备注（选填）" />
+          <!-- 操作内容 -->
+          <van-field
+            v-model="operationContentName"
+            label="操作内容"
+            placeholder="请选择操作内容"
+            readonly
+            is-link
+            required
+            :rules="[{ required: true, message: '请选择操作内容' }]"
+            @click="showOperationPicker = true"
+          />
+          
+          <!-- 动物类型 -->
+          <van-field
+            v-model="animalTypeName"
+            label="动物类型"
+            placeholder="请选择动物类型"
+            readonly
+            is-link
+            required
+            :rules="[{ required: true, message: '请选择动物类型' }]"
+            @click="showAnimalTypePicker = true"
+          />
+          
+          <!-- 动物数量 -->
+          <van-field
+            v-model="formData.quantity"
+            type="number"
+            label="动物数量"
+            placeholder="请输入动物数量"
+            required
+            :rules="quantityRules"
+          />
+          
+          <!-- 备注 -->
+          <van-field
+            v-model="formData.remark"
+            type="textarea"
+            label="备注"
+            placeholder="备注(选填)"
+            rows="3"
+            maxlength="200"
+            show-word-limit
+          />
+          
+          <!-- 时间选择 -->
+          <div v-if="formData.operation_content_id && formData.animal_type_id" class="time-picker-section">
+            <date-time-slot-picker
+              v-model="dateTimeValue"
+              :advance-days="advanceDays"
+              :show-remaining="false"
+              :multiple="true"
+              :fetch-slots="fetchTimeSlots"
+            />
+          </div>
         </van-cell-group>
-        <div class="submit-btn">
-          <van-button block round type="primary" native-type="submit">提交预约</van-button>
+        
+        <!-- 提交按钮 -->
+        <div class="submit-section">
+          <van-button
+            round
+            block
+            type="primary"
+            native-type="submit"
+            :loading="submitting"
+          >
+            提交预约
+          </van-button>
         </div>
       </van-form>
+      
+      <!-- 操作内容选择器 -->
+      <van-popup v-model:show="showOperationPicker" position="bottom">
+        <van-picker
+          :columns="operationContentOptions"
+          @confirm="onOperationContentConfirm"
+          @cancel="showOperationPicker = false"
+        />
+      </van-popup>
+      
+      <!-- 动物类型选择器 -->
+      <van-popup v-model:show="showAnimalTypePicker" position="bottom">
+        <van-picker
+          :columns="animalTypeOptions"
+          @confirm="onAnimalTypeConfirm"
+          @cancel="showAnimalTypePicker = false"
+        />
+      </van-popup>
     </div>
   </app-layout>
 </template>
 
 <script setup>
-import { ref } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
-import { showToast } from 'vant'
+import { showToast, showSuccessToast, showDialog } from 'vant'
 import AppLayout from '@/components/layout/AppLayout.vue'
-import { createExperimentOrder } from '@/api/experiment'
+import DateTimeSlotPicker from '@/components/common/DateTimeSlotPicker.vue'
+import { getExperimentTimeSlots, createExperimentOrder } from '@/api/experiment'
+import { getAnimalTypes, getOperationContents } from '@/api/common'
+import { useConfigStore } from '@/stores/config'
 
 const router = useRouter()
+const configStore = useConfigStore()
+const formRef = ref(null)
+
+/**
+ * 表单数据
+ */
 const formData = ref({
   operation_content_id: null,
   animal_type_id: null,
   quantity: '',
-  reservation_date: '',
-  time_slots: [],
   remark: ''
 })
 
+/**
+ * 日期时间选择器的值
+ */
+const dateTimeValue = ref({
+  date: '',
+  slots: []
+})
+
+/**
+ * 操作内容相关
+ */
+const operationContentOptions = ref([])
+const operationContentName = ref('')
+const showOperationPicker = ref(false)
+
+/**
+ * 动物类型相关
+ */
+const animalTypeOptions = ref([])
+const animalTypeName = ref('')
+const showAnimalTypePicker = ref(false)
+
+/**
+ * 所有时间段列表（预设的时间段配置）
+ */
+const allTimeSlots = ref([])
+
+/**
+ * 提交状态
+ */
+const submitting = ref(false)
+
+/**
+ * 提前预约天数（从全局配置获取）
+ */
+const advanceDays = computed(() => {
+  return configStore.advanceDays.experiment_advance_days || 7
+})
+
+/**
+ * 数量校验规则
+ */
+const quantityRules = [
+  { required: true, message: '请输入动物数量' },
+  { 
+    validator: (val) => {
+      if (!val || val <= 0) {
+        return '数量必须大于0'
+      }
+      return true
+    }
+  }
+]
+
+/**
+ * 初始化数据
+ */
+onMounted(async () => {
+  await Promise.all([
+    loadOperationContents(),
+    loadAnimalTypes(),
+    loadTimeSlots(),
+    configStore.loadAdvanceDays()
+  ])
+})
+
+/**
+ * 加载操作内容列表
+ */
+async function loadOperationContents() {
+  try {
+    const data = await getOperationContents()
+    operationContentOptions.value = (data || []).map(item => ({
+      text: item.name,
+      value: item.id
+    }))
+  } catch (error) {
+    console.error('加载操作内容失败:', error)
+    showToast('加载操作内容失败')
+  }
+}
+
+/**
+ * 加载动物类型列表
+ */
+async function loadAnimalTypes() {
+  try {
+    const data = await getAnimalTypes()
+    animalTypeOptions.value = (data || []).map(item => ({
+      text: item.name,
+      value: item.id
+    }))
+  } catch (error) {
+    console.error('加载动物类型失败:', error)
+    showToast('加载动物类型失败')
+  }
+}
+
+/**
+ * 加载时间段列表（预设的时间段配置）
+ */
+async function loadTimeSlots() {
+  try {
+    const data = await getExperimentTimeSlots()
+    allTimeSlots.value = data || []
+  } catch (error) {
+    console.error('加载时间段失败:', error)
+    showToast('加载时间段失败')
+  }
+}
+
+/**
+ * 选择操作内容
+ */
+function onOperationContentConfirm({ selectedOptions }) {
+  const selected = selectedOptions[0]
+  formData.value.operation_content_id = selected.value
+  operationContentName.value = selected.text
+  showOperationPicker.value = false
+  
+  // 清空时间选择
+  resetDateTime()
+}
+
+/**
+ * 选择动物类型
+ */
+function onAnimalTypeConfirm({ selectedOptions }) {
+  const selected = selectedOptions[0]
+  formData.value.animal_type_id = selected.value
+  animalTypeName.value = selected.text
+  showAnimalTypePicker.value = false
+  
+  // 清空时间选择
+  resetDateTime()
+}
+
+/**
+ * 获取时间段数据（供DateTimeSlotPicker组件调用）
+ * @param {string} date - 日期（实验代操作不需要查询可用时间段，直接返回预设的时间段）
+ */
+async function fetchTimeSlots(date) {
+  // 实验代操作的时间段是预设的，所有时间段都可用
+  return allTimeSlots.value.map(slot => ({
+    ...slot,
+    available: true,
+    remaining: 1 // 设置为1表示可用（虽然showRemaining为false不显示）
+  }))
+}
+
+/**
+ * 重置日期时间选择
+ */
+function resetDateTime() {
+  dateTimeValue.value = {
+    date: '',
+    slots: []
+  }
+}
+
+/**
+ * 提交表单
+ */
 async function handleSubmit() {
   try {
-    await createExperimentOrder(formData.value)
-    showToast('预约成功')
-    router.back()
+    // 表单验证
+    await formRef.value?.validate()
+    
+    // 验证操作内容
+    if (!formData.value.operation_content_id) {
+      showToast('请选择操作内容')
+      return
+    }
+    
+    // 验证动物类型
+    if (!formData.value.animal_type_id) {
+      showToast('请选择动物类型')
+      return
+    }
+    
+    // 验证日期
+    if (!dateTimeValue.value.date) {
+      showToast('请选择预约日期')
+      return
+    }
+
+    // 验证时间段
+    if (!dateTimeValue.value.slots || dateTimeValue.value.slots.length === 0) {
+      showToast('请至少选择一个时间段')
+      return
+    }
+    
+    // 二次确认
+    await showDialog({
+      title: '确认提交',
+      message: `确认预约 ${formData.value.quantity} 只动物的实验代操作吗?`,
+      confirmButtonText: '确认',
+      cancelButtonText: '取消'
+    })
+    
+    submitting.value = true
+    
+    // 组装提交数据
+    const submitData = {
+      operation_content_id: formData.value.operation_content_id,
+      animal_type_id: formData.value.animal_type_id,
+      quantity: Number(formData.value.quantity),
+      reservation_date: dateTimeValue.value.date,
+      time_slots: dateTimeValue.value.slots.map(slot => slot.display_time),
+      remark: formData.value.remark
+    }
+    
+    // 提交订单
+    await createExperimentOrder(submitData)
+    
+    showSuccessToast('提交成功，请等待审核')
+    
+    // 延迟返回,让用户看到成功提示
+    setTimeout(() => {
+      router.back()
+    }, 1500)
   } catch (error) {
-    console.error('预约失败:', error)
+    if (error !== 'cancel') {
+      console.error('提交失败:', error)
+      showToast(error.message || '提交失败')
+    }
+  } finally {
+    submitting.value = false
   }
 }
 </script>
 
 <style lang="less" scoped>
 .experiment-page {
+  padding-top: @padding-md;
+  
   .page-title {
     font-size: @font-size-xl;
+    font-weight: 600;
     margin-bottom: @padding-lg;
+    
+    @media (max-width: 767px) {
+      display: none;
+    }
   }
-  .submit-btn {
-    margin-top: @padding-lg;
+  
+  .time-picker-section {
+    margin: @padding-lg 0;
+    padding: @padding-md;
+    background-color: var(--bg-color-white);
+    border-radius: @border-radius-md;
+  }
+  
+  .submit-section {
+    margin-top: @padding-xl;
+    padding: 0 @padding-md;
+  }
+  
+  :deep(.van-cell-group) {
+    margin-bottom: @padding-md;
   }
 }
 </style>

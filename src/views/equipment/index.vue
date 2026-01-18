@@ -246,9 +246,9 @@ async function handleSubmit() {
     await createEquipmentOrder(submitData)
     showSuccessToast('提交成功，请等待审核')
     
-    // 跳转到订单列表
+    // 延迟返回,让用户看到成功提示
     setTimeout(() => {
-      router.push('/orders')
+      router.back()
     }, 1500)
   } catch (error) {
     console.error('提交订单失败:', error)
