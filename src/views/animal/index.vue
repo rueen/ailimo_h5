@@ -4,7 +4,7 @@
       <h2 class="page-title">动物订购</h2>
       
       <van-form @submit="handleSubmit" ref="formRef">
-        <van-cell-group inset>
+        <van-cell-group>
           <!-- 品牌 -->
           <van-field
             v-model="brandName"

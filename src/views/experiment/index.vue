@@ -4,7 +4,7 @@
       <h2 class="page-title">实验代操作</h2>
       
       <van-form @submit="handleSubmit" ref="formRef">
-        <van-cell-group inset>
+        <van-cell-group>
           <!-- 操作内容 -->
           <van-field
             v-model="operationContentName"

@@ -1,10 +1,17 @@
+<!--
+ * @Author: diaochan diaochan@seatent.com
+ * @Date: 2026-01-17 19:16:39
+ * @LastEditors: diaochan diaochan@seatent.com
+ * @LastEditTime: 2026-01-18 21:30:10
+ * @FilePath: /ailimo_h5/src/views/about/index.vue
+ * @Description: 这是默认设置,请设置`customMade`, 打开koroFileHeader查看配置 进行设置: https://github.com/OBKoro1/koro1FileHeader/wiki/%E9%85%8D%E7%BD%AE
+-->
 <template>
   <app-layout>
     <div class="about-page page-content">
       <van-loading v-if="loading" vertical>加载中...</van-loading>
       
       <div v-else-if="companyInfo" class="about-content">
-        <h2 class="page-title">关于我们</h2>
         
         <div v-if="companyInfo.company_name" class="info-section">
           <h3>公司名称</h3>
@@ -23,7 +30,7 @@
 
         <div class="contact-section">
           <h3>联系方式</h3>
-          <van-cell-group inset>
+          <van-cell-group>
             <van-cell v-if="companyInfo.contact_phone" title="联系电话" :value="companyInfo.contact_phone" />
             <van-cell v-if="companyInfo.email" title="邮箱" :value="companyInfo.email" />
             <van-cell v-if="companyInfo.company_address" title="公司地址" :label="companyInfo.company_address" />

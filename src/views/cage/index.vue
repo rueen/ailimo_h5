@@ -3,7 +3,7 @@
     <div class="cage-page page-content">
       <h2 class="page-title">笼位租赁</h2>
       <van-form @submit="handleSubmit" ref="formRef">
-        <van-cell-group inset>
+        <van-cell-group>
           <!-- 动物类型 -->
           <van-field
             v-model="animalTypeName"

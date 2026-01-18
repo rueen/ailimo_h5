@@ -1,7 +1,14 @@
+<!--
+ * @Author: diaochan diaochan@seatent.com
+ * @Date: 2026-01-17 19:16:32
+ * @LastEditors: diaochan diaochan@seatent.com
+ * @LastEditTime: 2026-01-18 21:31:18
+ * @FilePath: /ailimo_h5/src/views/services/index.vue
+ * @Description: 这是默认设置,请设置`customMade`, 打开koroFileHeader查看配置 进行设置: https://github.com/OBKoro1/koro1FileHeader/wiki/%E9%85%8D%E7%BD%AE
+-->
 <template>
   <app-layout>
     <div class="services-page page-content">
-      <h2 class="page-title">服务中心</h2>
       <div class="services-list">
         <service-card
           v-for="service in serviceList"

@@ -1,8 +1,6 @@
 <template>
   <app-layout>
     <div class="cases-page page-content">
-      <h2 class="page-title">案例展示</h2>
-
       <van-list
         v-model:loading="loading"
         :finished="finished"

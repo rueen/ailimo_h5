@@ -1,10 +1,9 @@
 <template>
   <app-layout>
-    <div class="equipment-page">
+    <div class="equipment-page page-content">
       <h2 class="page-title">设备租赁</h2>
-
       <van-form @submit="handleSubmit">
-        <van-cell-group inset>
+        <van-cell-group>
           <!-- 设备选择 -->
           <van-field
             v-model="equipmentName"

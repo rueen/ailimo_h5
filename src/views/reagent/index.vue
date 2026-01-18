@@ -4,7 +4,7 @@
       <h2 class="page-title">试剂耗材订购</h2>
       
       <van-form @submit="handleSubmit" ref="formRef">
-        <van-cell-group inset>
+        <van-cell-group>
           <!-- 试剂耗材名称 -->
           <van-field
             v-model="formData.name"
