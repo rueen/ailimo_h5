@@ -21,12 +21,27 @@
 
       <!-- 右侧操作区 -->
       <div class="header-actions">
-        <template v-if="userStore.isLoggedIn">
-          <span class="user-name">{{ userStore.userInfo?.name }}</span>
-          <van-button size="small" type="default" @click="handleLogout">
-            退出
-          </van-button>
-        </template>
+        <!-- 已登录状态 -->
+        <div v-if="userStore.isLoggedIn" class="user-info-wrapper" @mouseenter="showDropdown = true" @mouseleave="showDropdown = false">
+          <div class="user-info">
+            <van-icon name="user-circle-o" size="20" />
+            <span class="user-name">{{ userStore.userInfo?.name }}</span>
+            <van-icon name="arrow-down" size="14" :class="{ rotate: showDropdown }" />
+          </div>
+          <!-- 下拉菜单 -->
+          <Transition name="dropdown">
+            <div v-if="showDropdown" class="dropdown-menu">
+              <div class="dropdown-item" @click="handleMyOrders">
+                <span>我的订单</span>
+              </div>
+              <div class="dropdown-divider"></div>
+              <div class="dropdown-item" @click="handleLogout">
+                <span>退出登录</span>
+              </div>
+            </div>
+          </Transition>
+        </div>
+        <!-- 未登录状态 -->
         <template v-else>
           <van-button size="small" type="default" @click="goLogin">
             登录
@@ -41,7 +56,7 @@
 </template>
 
 <script setup>
-import { computed } from 'vue'
+import { ref, computed } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { showConfirmDialog } from 'vant'
 import { useUserStore } from '@/stores/user'
@@ -49,6 +64,7 @@ import { useUserStore } from '@/stores/user'
 const router = useRouter()
 const route = useRoute()
 const userStore = useUserStore()
+const showDropdown = ref(false)
 
 /**
  * Logo 地址
@@ -105,6 +121,18 @@ function goLogin() {
  */
 function goRegister() {
   router.push('/register')
+}
+
+/**
+ * 处理我的订单
+ */
+const handleMyOrders = () => {
+  showDropdown.value = false
+  if (!userStore.isLoggedIn) {
+    router.push('/login?redirect=/orders')
+  } else {
+    router.push('/orders')
+  }
 }
 
 /**
@@ -184,9 +212,65 @@ async function handleLogout() {
     align-items: center;
     gap: 12px;
 
+    .user-info-wrapper {
+      position: relative;
+    }
+
+    .user-info {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      cursor: pointer;
+      padding: 8px 12px;
+      border-radius: 8px;
+      transition: background-color 0.3s;
+    }
+
+    .user-info:hover {
+      background-color: @bg-color;
+    }
+
     .user-name {
       font-size: @font-size-md;
       color: var(--text-color);
+    }
+
+    .user-info .rotate {
+      transform: rotate(180deg);
+      transition: transform 0.3s;
+    }
+
+    .dropdown-menu {
+      position: absolute;
+      top: 100%;
+      right: 0;
+      background: #fff;
+      border-radius: 8px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+      min-width: 160px;
+      z-index: 1000;
+      overflow: hidden;
+    }
+
+    .dropdown-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 12px 16px;
+      font-size: 14px;
+      color: @text-color;
+      cursor: pointer;
+      transition: background-color 0.3s;
+    }
+
+    .dropdown-item:hover {
+      background-color: @bg-color;
+    }
+
+    .dropdown-divider {
+      height: 1px;
+      background-color: @border-color;
+      margin: 4px 0;
     }
   }
 
