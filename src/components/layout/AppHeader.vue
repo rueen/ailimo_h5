@@ -195,7 +195,7 @@ async function handleLogout() {
     gap: 32px;
 
     a {
-      font-size: @font-size-md;
+      font-size: @font-size-lg;
       color: var(--text-color-2);
       cursor: pointer;
       transition: color 0.3s;
@@ -270,7 +270,6 @@ async function handleLogout() {
     .dropdown-divider {
       height: 1px;
       background-color: @border-color;
-      margin: 4px 0;
     }
   }
 

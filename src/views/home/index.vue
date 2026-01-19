@@ -290,7 +290,7 @@ function goServices() {
         width: 48px;
         height: 48px;
         margin: 0 auto 16px;
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        background: @primary-color;
         border-radius: 50%;
         display: flex;
         align-items: center;
