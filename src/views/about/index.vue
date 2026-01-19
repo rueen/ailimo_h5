@@ -9,34 +9,35 @@
 <template>
   <app-layout>
     <div class="about-page page-content">
-      <van-loading v-if="loading" vertical>加载中...</van-loading>
-      
+      <div v-if="loading" class="about-loading">
+        <van-loading vertical>加载中...</van-loading>
+      </div>
+
       <div v-else-if="companyInfo" class="about-content">
-        
-        <div v-if="companyInfo.company_name" class="info-section">
-          <h3>公司名称</h3>
-          <p>{{ companyInfo.company_name }}</p>
-        </div>
+        <section v-if="companyInfo.company_name" class="info-section">
+          <h3 class="section-head">公司名称</h3>
+          <p class="section-body">{{ companyInfo.company_name }}</p>
+        </section>
 
-        <div v-if="companyInfo.company_intro" class="info-section">
-          <h3>公司简介</h3>
-          <p>{{ companyInfo.company_intro }}</p>
-        </div>
+        <section v-if="companyInfo.company_intro" class="info-section">
+          <h3 class="section-head">公司简介</h3>
+          <p class="section-body">{{ companyInfo.company_intro }}</p>
+        </section>
 
-        <div v-if="companyInfo.service_concept" class="info-section">
-          <h3>服务理念</h3>
-          <p>{{ companyInfo.service_concept }}</p>
-        </div>
+        <section v-if="companyInfo.service_concept" class="info-section">
+          <h3 class="section-head">服务理念</h3>
+          <p class="section-body">{{ companyInfo.service_concept }}</p>
+        </section>
 
-        <div class="contact-section">
-          <h3>联系方式</h3>
+        <section class="contact-section">
+          <h3 class="section-head">联系方式</h3>
           <van-cell-group>
             <van-cell v-if="companyInfo.contact_phone" title="联系电话" :value="companyInfo.contact_phone" />
             <van-cell v-if="companyInfo.email" title="邮箱" :value="companyInfo.email" />
             <van-cell v-if="companyInfo.company_address" title="公司地址" :label="companyInfo.company_address" />
             <van-cell v-if="companyInfo.work_time" title="工作时间" :value="companyInfo.work_time" />
           </van-cell-group>
-        </div>
+        </section>
       </div>
     </div>
   </app-layout>
@@ -62,31 +63,77 @@ const companyInfo = computed(() => companyStore.companyInfo)
 
 <style lang="less" scoped>
 .about-page {
+  padding-top: @padding-md;
 
-  .info-section {
-    margin-bottom: @padding-xl;
+  /* 加载状态：垂直居中，避免布局跳动 */
+  .about-loading {
+    min-height: 200px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: @padding-xl;
+  }
 
-    h3 {
-      font-size: @font-size-lg;
-      font-weight: 600;
+  /* 信息块 / 联系方式的统一卡片样式 */
+  .info-section,
+  .contact-section {
+    margin-bottom: @padding-lg;
+    padding: @padding-lg;
+    background-color: var(--bg-color-white);
+    border-radius: @border-radius-md;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+  }
+
+  /* 区块标题：左侧主题色竖线强调 */
+  .section-head {
+    position: relative;
+    padding-left: (@padding-sm + 4px);
+    margin-bottom: @padding-md;
+    font-size: @font-size-lg;
+    font-weight: 600;
+    color: var(--text-color);
+    border-left: 4px solid @primary-color;
+  }
+
+  /* 正文：行高与换行 */
+  .section-body {
+    margin: 0;
+    font-size: @font-size-md;
+    color: var(--text-color-2);
+    line-height: 1.8;
+    white-space: pre-wrap;
+  }
+
+  /* 联系方式：底部无外边距，Cell 组与卡片统一 */
+  .contact-section {
+    margin-bottom: 0;
+
+    .section-head {
       margin-bottom: @padding-sm;
-      color: var(--text-color);
     }
 
-    p {
-      font-size: @font-size-md;
-      color: var(--text-color-2);
-      line-height: 1.8;
-      white-space: pre-wrap;
+    :deep(.van-cell-group) {
+      margin: 0;
+      background: transparent;
+    }
+
+    :deep(.van-cell) {
+      padding: @padding-sm @padding-md;
     }
   }
 
-  .contact-section {
-    h3 {
-      font-size: @font-size-lg;
-      font-weight: 600;
-      margin-bottom: @padding-md;
-      color: var(--text-color);
+  @media (max-width: 767px) {
+    .info-section,
+    .contact-section {
+      padding: @padding-md;
+    }
+
+    .section-head {
+      font-size: @font-size-md;
+    }
+
+    .section-body {
+      font-size: @font-size-sm;
     }
   }
 }
