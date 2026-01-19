@@ -153,11 +153,9 @@ router.beforeEach((to, from, next) => {
     if (to.meta.requiresAudit) {
       if (!userStore.isAuditPassed()) {
         if (userStore.needAudit()) {
-          showToast('账号审核中，请等待审核通过')
           next('/audit-status')
           return
         } else if (userStore.isAuditRejected()) {
-          showToast('账号审核未通过')
           next('/audit-status')
           return
         }

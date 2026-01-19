@@ -59,17 +59,6 @@ export function getProfile() {
 }
 
 /**
- * 查看审核状态
- * @returns {Promise}
- */
-export function getAuditStatus() {
-  return request({
-    url: '/h5/auth/audit-status',
-    method: 'get'
-  })
-}
-
-/**
  * 退出登录
  * @returns {Promise}
  */

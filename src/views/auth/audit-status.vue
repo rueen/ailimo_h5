@@ -42,7 +42,6 @@
           <van-cell
             v-if="auditInfo.reject_reason"
             title="拒绝原因"
-            :value="auditInfo.reject_reason"
             :label="auditInfo.reject_reason"
           />
         </van-cell-group>
@@ -83,19 +82,20 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted } from 'vue'
+import { computed, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { showToast } from 'vant'
 import AppLayout from '@/components/layout/AppLayout.vue'
-import { getAuditStatus } from '@/api/auth'
+import { useUserStore } from '@/stores/user'
 import { formatDateTime } from '@/utils/format'
 
 const router = useRouter()
+const userStore = useUserStore()
 
 /**
- * 审核信息
+ * 审核信息（从 user store 获取）
  */
-const auditInfo = ref(null)
+const auditInfo = computed(() => userStore.userInfo)
 
 /**
  * 审核状态
@@ -129,11 +129,11 @@ const statusDesc = computed(() => {
 })
 
 /**
- * 加载审核状态
+ * 加载审核状态（使用 store 的 getProfile）
  */
 async function loadAuditStatus() {
   try {
-    auditInfo.value = await getAuditStatus()
+    await userStore.getProfile()
   } catch (error) {
     console.error('加载审核状态失败:', error)
   }
