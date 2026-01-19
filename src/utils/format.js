@@ -58,7 +58,7 @@ export function formatMoney(amount) {
 }
 
 /**
- * 订单状态文本映射（租赁类订单）
+ * 订单状态文本映射（预约类订单）
  */
 export const ORDER_STATUS_MAP = {
   0: '待审核',
@@ -100,7 +100,7 @@ export const GENDER_MAP = {
 /**
  * 获取订单状态文本
  * @param {number} status - 状态值
- * @param {string} type - 订单类型：'rental'(租赁类) 或 'purchase'(订购类)
+ * @param {string} type - 订单类型：'rental'(预约类) 或 'purchase'(订购类)
  * @returns {string} 状态文本
  */
 export function getOrderStatusText(status, type = 'rental') {

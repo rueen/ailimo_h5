@@ -72,13 +72,13 @@
             </template>
           </van-cell>
           
-          <!-- 租赁数量 -->
+          <!-- 预约数量 -->
           <van-field
             v-if="showQuantityInput"
             v-model="formData.quantity"
             type="number"
-            label="租赁数量"
-            placeholder="请输入租赁数量"
+            label="预约数量"
+            placeholder="请输入预约数量"
             required
             :rules="quantityRules"
           />
@@ -239,7 +239,7 @@ const availableQuantity = computed(() => {
  * 数量校验规则
  */
 const quantityRules = computed(() => [
-  { required: true, message: '请输入租赁数量' },
+  { required: true, message: '请输入预约数量' },
   { 
     validator: (val) => {
       if (!val || val <= 0) {
