@@ -2,13 +2,14 @@
  * @Author: diaochan diaochan@seatent.com
  * @Date: 2026-01-17 19:17:05
  * @LastEditors: diaochan diaochan@seatent.com
- * @LastEditTime: 2026-01-17 21:36:51
+ * @LastEditTime: 2026-01-19 16:10:11
  * @FilePath: /ailimo_h5/src/views/equipment/detail.vue
  * @Description: 这是默认设置,请设置`customMade`, 打开koroFileHeader查看配置 进行设置: https://github.com/OBKoro1/koro1FileHeader/wiki/%E9%85%8D%E7%BD%AE
 -->
 <template>
   <app-layout>
-    <div class="equipment-detail-page">
+    <div class="equipment-detail-page page-content">
+      <page-title title="设备详情" @back="router.back()" />
       <van-loading v-if="loading" vertical>加载中...</van-loading>
       
       <div v-else-if="equipment" class="equipment-detail">
@@ -51,6 +52,7 @@ import { useRouter, useRoute } from 'vue-router'
 import { showImagePreview } from 'vant'
 import AppLayout from '@/components/layout/AppLayout.vue'
 import { getEquipmentDetail } from '@/api/equipment'
+import PageTitle from '@/components/common/PageTitle.vue'
 
 const router = useRouter()
 const route = useRoute()
@@ -110,22 +112,16 @@ onMounted(() => {
 </script>
 
 <style lang="less" scoped>
-.equipment-detail-page {
-  background-color: var(--bg-color-white);
-  padding: @padding-md;
-}
 
 .equipment-detail {
-  
+  background-color: #fff;
+  padding: @padding-md;
+  border-radius: @border-radius-md;
+
   .equipment-images {
     display: grid;
     grid-template-columns: repeat(1, 1fr);
     margin-bottom: @padding-lg;
-
-    @media (min-width: 768px) {
-      grid-template-columns: repeat(3, 1fr);
-      gap: @padding-md;
-    }
 
     .image-item {
       width: 100%;
