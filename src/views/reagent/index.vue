@@ -15,27 +15,23 @@
           />
           
           <!-- 品牌 -->
-          <van-field
-            v-model="brandName"
+          <universal-picker
+            v-model="formData.brand_id"
+            :columns="brandOptions"
             label="品牌"
             placeholder="请选择品牌"
-            readonly
-            is-link
             required
             :rules="[{ required: true, message: '请选择品牌' }]"
-            @click="showBrandPicker = true"
           />
           
           <!-- 规格 -->
-          <van-field
-            v-model="specificationName"
+          <universal-picker
+            v-model="formData.specification_id"
+            :columns="specificationOptions"
             label="规格"
             placeholder="请选择规格"
-            readonly
-            is-link
             required
             :rules="[{ required: true, message: '请选择规格' }]"
-            @click="showSpecificationPicker = true"
           />
           
           <!-- 数量 -->
@@ -68,15 +64,14 @@
           />
           
           <!-- 到货日期 -->
-          <van-field
+          <universal-date-picker
             v-model="formData.delivery_date"
             label="到货日期"
             placeholder="请选择到货日期"
-            readonly
-            is-link
+            title="选择到货日期"
             required
+            :min-date="minDate"
             :rules="[{ required: true, message: '请选择到货日期' }]"
-            @click="showDatePicker = true"
           />
           
           <!-- 地区选择 -->
@@ -118,35 +113,6 @@
           </van-button>
         </div>
       </van-form>
-      
-      <!-- 品牌选择器 -->
-      <van-popup v-model:show="showBrandPicker" position="bottom">
-        <van-picker
-          :columns="brandOptions"
-          @confirm="onBrandConfirm"
-          @cancel="showBrandPicker = false"
-        />
-      </van-popup>
-      
-      <!-- 规格选择器 -->
-      <van-popup v-model:show="showSpecificationPicker" position="bottom">
-        <van-picker
-          :columns="specificationOptions"
-          @confirm="onSpecificationConfirm"
-          @cancel="showSpecificationPicker = false"
-        />
-      </van-popup>
-      
-      <!-- 日期选择器 -->
-      <van-popup v-model:show="showDatePicker" position="bottom">
-        <van-date-picker
-          v-model="selectedDate"
-          title="选择到货日期"
-          :min-date="minDate"
-          @confirm="onDateConfirm"
-          @cancel="showDatePicker = false"
-        />
-      </van-popup>
     </div>
   </app-layout>
 </template>
@@ -157,6 +123,8 @@ import { useRouter } from 'vue-router'
 import { showToast, showSuccessToast, showDialog } from 'vant'
 import AppLayout from '@/components/layout/AppLayout.vue'
 import RegionPicker from '@/components/common/RegionPicker.vue'
+import UniversalPicker from '@/components/common/UniversalPicker.vue'
+import UniversalDatePicker from '@/components/common/UniversalDatePicker.vue'
 import { createReagentOrder } from '@/api/reagent'
 import {
   getReagentBrands,
@@ -192,27 +160,18 @@ const regionValue = ref({
 })
 
 /**
- * 品牌相关
+ * 品牌选项
  */
 const brandOptions = ref([])
-const brandName = ref('')
-const showBrandPicker = ref(false)
 
 /**
- * 规格相关
+ * 规格选项
  */
 const specificationOptions = ref([])
-const specificationName = ref('')
-const showSpecificationPicker = ref(false)
 
 /**
- * 日期选择相关
+ * 最小日期（今天）
  */
-const showDatePicker = ref(false)
-const today = new Date()
-// VanDatePicker 的 v-model 需要数组格式 [year, month, day]
-const selectedDate = ref([today.getFullYear(), today.getMonth() + 1, today.getDate()])
-// 但是 min-date 需要 Date 对象
 const minDate = ref(new Date())
 
 /**
@@ -290,38 +249,6 @@ async function loadSpecifications() {
     console.error('加载规格列表失败:', error)
     showToast('加载规格列表失败')
   }
-}
-
-/**
- * 选择品牌
- */
-function onBrandConfirm({ selectedOptions }) {
-  const selected = selectedOptions[0]
-  formData.value.brand_id = selected.value
-  brandName.value = selected.text
-  showBrandPicker.value = false
-}
-
-/**
- * 选择规格
- */
-function onSpecificationConfirm({ selectedOptions }) {
-  const selected = selectedOptions[0]
-  formData.value.specification_id = selected.value
-  specificationName.value = selected.text
-  showSpecificationPicker.value = false
-}
-
-/**
- * 确认选择日期
- * @param {Object} value - 选择的日期对象，包含 selectedValues 数组
- */
-function onDateConfirm({ selectedValues }) {
-  const [year, month, day] = selectedValues
-  const monthStr = String(month).padStart(2, '0')
-  const dayStr = String(day).padStart(2, '0')
-  formData.value.delivery_date = `${year}-${monthStr}-${dayStr}`
-  showDatePicker.value = false
 }
 
 /**

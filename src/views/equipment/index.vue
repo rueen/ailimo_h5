@@ -5,14 +5,13 @@
       <van-form @submit="handleSubmit">
         <van-cell-group>
           <!-- 设备选择 -->
-          <van-field
-            v-model="equipmentName"
+          <universal-picker
+            v-model="form.equipment_id"
+            :columns="equipmentColumns"
             label="设备"
             placeholder="请选择设备"
-            readonly
-            is-link
             required
-            @click="showEquipmentPicker = true"
+            @change="onEquipmentChange"
           />
           <div class="equipment-detail-btn" @click="viewEquipmentDetail">
             <span>查看设备详情</span>
@@ -55,15 +54,6 @@
           </van-button>
         </div>
       </van-form>
-
-      <!-- 设备选择弹窗 -->
-      <van-popup v-model:show="showEquipmentPicker" position="bottom" round>
-        <van-picker
-          :columns="equipmentColumns"
-          @confirm="onEquipmentConfirm"
-          @cancel="showEquipmentPicker = false"
-        />
-      </van-popup>
     </div>
   </app-layout>
 </template>
@@ -74,6 +64,7 @@ import { useRouter } from 'vue-router'
 import { showToast, showSuccessToast } from 'vant'
 import AppLayout from '@/components/layout/AppLayout.vue'
 import PageTitle from '@/components/common/PageTitle.vue'
+import UniversalPicker from '@/components/common/UniversalPicker.vue'
 import DateTimeSlotPicker from '@/components/common/DateTimeSlotPicker.vue'
 import { getEquipmentList, getEquipmentAvailableSlots, createEquipmentOrder } from '@/api/equipment'
 import { useConfigStore } from '@/stores/config'
@@ -112,11 +103,6 @@ const advanceDays = computed(() => {
 })
 
 /**
- * 显示设备选择器
- */
-const showEquipmentPicker = ref(false)
-
-/**
  * 提交状态
  */
 const submitting = ref(false)
@@ -130,22 +116,6 @@ const equipmentColumns = computed(() => {
     value: item.id,
     details: item.details
   }))
-})
-
-/**
- * 选中的设备名称
- */
-const equipmentName = computed(() => {
-  const equipment = equipmentList.value.find(item => item.id === form.value.equipment_id)
-  return equipment?.name || ''
-})
-
-/**
- * 设备信息
- */
-const equipmentInfo = computed(() => {
-  const equipment = equipmentList.value.find(item => item.id === form.value.equipment_id)
-  return equipment?.details?.base_info || ''
 })
 
 /**
@@ -184,20 +154,14 @@ async function fetchTimeSlots(date) {
 }
 
 /**
- * 设备选择确认
- * @param {object} value - 选中的值
+ * 设备改变事件
  */
-function onEquipmentConfirm({ selectedOptions }) {
-  const selected = selectedOptions[0]
-  form.value.equipment_id = selected.value
-  
+function onEquipmentChange({ selectedOption }) {
   // 清空之前选择的时间
   dateTimeValue.value = {
     date: '',
     slots: []
   }
-  
-  showEquipmentPicker.value = false
 }
 
 /**

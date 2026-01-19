@@ -5,40 +5,36 @@
       <van-form @submit="handleSubmit" ref="formRef">
         <van-cell-group>
           <!-- 动物类型 -->
-          <van-field
-            v-model="animalTypeName"
+          <universal-picker
+            v-model="formData.animal_type_id"
+            :columns="animalTypeOptions"
             label="动物类型"
             placeholder="请选择动物类型"
-            readonly
-            is-link
             required
             :rules="[{ required: true, message: '请选择动物类型' }]"
-            @click="showAnimalTypePicker = true"
+            @change="onAnimalTypeChange"
           />
           
           <!-- 环境类型 -->
-          <van-field
-            v-model="environmentName"
+          <universal-picker
+            v-model="formData.environment_id"
+            :columns="environmentOptions"
             label="环境类型"
             placeholder="请先选择动物类型"
-            readonly
-            is-link
             required
-            :rules="[{ required: true, message: '请选择环境类型' }]"
             :disabled="!formData.animal_type_id"
-            @click="handleEnvironmentClick"
+            :rules="[{ required: true, message: '请选择环境类型' }]"
+            @change="onEnvironmentChange"
           />
           
           <!-- 笼位用途 -->
-          <van-field
-            v-model="purposeName"
+          <universal-picker
+            v-model="formData.purpose_id"
+            :columns="purposeOptions"
             label="笼位用途"
             placeholder="请选择笼位用途"
-            readonly
-            is-link
             required
             :rules="[{ required: true, message: '请选择笼位用途' }]"
-            @click="showPurposePicker = true"
           />
           
           <!-- 备注 -->
@@ -96,33 +92,6 @@
           </van-button>
         </div>
       </van-form>
-      
-      <!-- 动物类型选择器 -->
-      <van-popup v-model:show="showAnimalTypePicker" position="bottom">
-        <van-picker
-          :columns="animalTypeOptions"
-          @confirm="onAnimalTypeConfirm"
-          @cancel="showAnimalTypePicker = false"
-        />
-      </van-popup>
-      
-      <!-- 环境类型选择器 -->
-      <van-popup v-model:show="showEnvironmentPicker" position="bottom">
-        <van-picker
-          :columns="environmentOptions"
-          @confirm="onEnvironmentConfirm"
-          @cancel="showEnvironmentPicker = false"
-        />
-      </van-popup>
-      
-      <!-- 笼位用途选择器 -->
-      <van-popup v-model:show="showPurposePicker" position="bottom">
-        <van-picker
-          :columns="purposeOptions"
-          @confirm="onPurposeConfirm"
-          @cancel="showPurposePicker = false"
-        />
-      </van-popup>
     </div>
   </app-layout>
 </template>
@@ -132,6 +101,7 @@ import { ref, computed, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { showToast, showDialog } from 'vant'
 import AppLayout from '@/components/layout/AppLayout.vue'
+import UniversalPicker from '@/components/common/UniversalPicker.vue'
 import DateTimeSlotPicker from '@/components/common/DateTimeSlotPicker.vue'
 import { 
   getEnvironmentsByAnimalType,
@@ -169,25 +139,19 @@ const dateTimeValue = ref({
 })
 
 /**
- * 动物类型相关
+ * 动物类型选项
  */
 const animalTypeOptions = ref([])
-const animalTypeName = ref('')
-const showAnimalTypePicker = ref(false)
 
 /**
- * 环境类型相关
+ * 环境类型选项
  */
 const environmentOptions = ref([])
-const environmentName = ref('')
-const showEnvironmentPicker = ref(false)
 
 /**
- * 笼位用途相关
+ * 笼位用途选项
  */
 const purposeOptions = ref([])
-const purposeName = ref('')
-const showPurposePicker = ref(false)
 
 /**
  * 时间段列表（缓存当前日期的时间段数据）
@@ -294,7 +258,6 @@ async function loadPurposes() {
     // 默认选择第一个用途
     if (purposeOptions.value.length > 0) {
       formData.value.purpose_id = purposeOptions.value[0].value
-      purposeName.value = purposeOptions.value[0].text
     }
   } catch (error) {
     console.error('加载笼位用途失败:', error)
@@ -303,14 +266,9 @@ async function loadPurposes() {
 }
 
 /**
- * 选择动物类型
+ * 动物类型改变事件
  */
-function onAnimalTypeConfirm({ selectedOptions }) {
-  const selected = selectedOptions[0]
-  formData.value.animal_type_id = selected.value
-  animalTypeName.value = selected.text
-  showAnimalTypePicker.value = false
-  
+function onAnimalTypeChange({ selectedOption }) {
   // 清空环境和后续选项
   resetFromEnvironment()
   
@@ -330,6 +288,7 @@ async function loadEnvironmentsByAnimalType() {
     })
     
     if (!data || data.length === 0) {
+      environmentOptions.value = []
       showToast('该动物类型暂无可用环境')
       return
     }
@@ -345,43 +304,11 @@ async function loadEnvironmentsByAnimalType() {
 }
 
 /**
- * 点击环境类型
+ * 环境类型改变事件
  */
-function handleEnvironmentClick() {
-  if (!formData.value.animal_type_id) {
-    showToast('请先选择动物类型')
-    return
-  }
-  
-  if (environmentOptions.value.length === 0) {
-    showToast('该动物类型暂无可用环境')
-    return
-  }
-  
-  showEnvironmentPicker.value = true
-}
-
-/**
- * 选择环境类型
- */
-function onEnvironmentConfirm({ selectedOptions }) {
-  const selected = selectedOptions[0]
-  formData.value.environment_id = selected.value
-  environmentName.value = selected.text
-  showEnvironmentPicker.value = false
-  
+function onEnvironmentChange({ selectedOption }) {
   // 清空时间选择
   resetDateTime()
-}
-
-/**
- * 选择笼位用途
- */
-function onPurposeConfirm({ selectedOptions }) {
-  const selected = selectedOptions[0]
-  formData.value.purpose_id = selected.value
-  purposeName.value = selected.text
-  showPurposePicker.value = false
 }
 
 /**
@@ -422,7 +349,6 @@ async function fetchTimeSlots(date) {
  */
 function resetFromEnvironment() {
   formData.value.environment_id = null
-  environmentName.value = ''
   environmentOptions.value = []
   resetDateTime()
 }

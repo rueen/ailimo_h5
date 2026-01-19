@@ -6,27 +6,25 @@
       <van-form @submit="handleSubmit" ref="formRef">
         <van-cell-group>
           <!-- 操作内容 -->
-          <van-field
-            v-model="operationContentName"
+          <universal-picker
+            v-model="formData.operation_content_id"
+            :columns="operationContentOptions"
             label="操作内容"
             placeholder="请选择操作内容"
-            readonly
-            is-link
             required
             :rules="[{ required: true, message: '请选择操作内容' }]"
-            @click="showOperationPicker = true"
+            @change="onOperationContentChange"
           />
           
           <!-- 动物类型 -->
-          <van-field
-            v-model="animalTypeName"
+          <universal-picker
+            v-model="formData.animal_type_id"
+            :columns="animalTypeOptions"
             label="动物类型"
             placeholder="请选择动物类型"
-            readonly
-            is-link
             required
             :rules="[{ required: true, message: '请选择动物类型' }]"
-            @click="showAnimalTypePicker = true"
+            @change="onAnimalTypeChange"
           />
           
           <!-- 动物数量 -->
@@ -75,24 +73,6 @@
           </van-button>
         </div>
       </van-form>
-      
-      <!-- 操作内容选择器 -->
-      <van-popup v-model:show="showOperationPicker" position="bottom">
-        <van-picker
-          :columns="operationContentOptions"
-          @confirm="onOperationContentConfirm"
-          @cancel="showOperationPicker = false"
-        />
-      </van-popup>
-      
-      <!-- 动物类型选择器 -->
-      <van-popup v-model:show="showAnimalTypePicker" position="bottom">
-        <van-picker
-          :columns="animalTypeOptions"
-          @confirm="onAnimalTypeConfirm"
-          @cancel="showAnimalTypePicker = false"
-        />
-      </van-popup>
     </div>
   </app-layout>
 </template>
@@ -102,6 +82,7 @@ import { ref, computed, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { showToast, showSuccessToast, showDialog } from 'vant'
 import AppLayout from '@/components/layout/AppLayout.vue'
+import UniversalPicker from '@/components/common/UniversalPicker.vue'
 import DateTimeSlotPicker from '@/components/common/DateTimeSlotPicker.vue'
 import { getExperimentTimeSlots, createExperimentOrder } from '@/api/experiment'
 import { getAnimalTypes, getOperationContents } from '@/api/common'
@@ -131,18 +112,14 @@ const dateTimeValue = ref({
 })
 
 /**
- * 操作内容相关
+ * 操作内容选项
  */
 const operationContentOptions = ref([])
-const operationContentName = ref('')
-const showOperationPicker = ref(false)
 
 /**
- * 动物类型相关
+ * 动物类型选项
  */
 const animalTypeOptions = ref([])
-const animalTypeName = ref('')
-const showAnimalTypePicker = ref(false)
 
 /**
  * 所有时间段列表（预设的时间段配置）
@@ -234,27 +211,17 @@ async function loadTimeSlots() {
 }
 
 /**
- * 选择操作内容
+ * 操作内容改变事件
  */
-function onOperationContentConfirm({ selectedOptions }) {
-  const selected = selectedOptions[0]
-  formData.value.operation_content_id = selected.value
-  operationContentName.value = selected.text
-  showOperationPicker.value = false
-  
+function onOperationContentChange({ selectedOption }) {
   // 清空时间选择
   resetDateTime()
 }
 
 /**
- * 选择动物类型
+ * 动物类型改变事件
  */
-function onAnimalTypeConfirm({ selectedOptions }) {
-  const selected = selectedOptions[0]
-  formData.value.animal_type_id = selected.value
-  animalTypeName.value = selected.text
-  showAnimalTypePicker.value = false
-  
+function onAnimalTypeChange({ selectedOption }) {
   // 清空时间选择
   resetDateTime()
 }
