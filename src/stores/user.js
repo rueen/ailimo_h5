@@ -28,6 +28,19 @@ export const useUserStore = defineStore('user', () => {
   }
 
   /**
+   * 设置认证信息（用于注册后自动登录等场景）
+   * @param {string} authToken - JWT token
+   * @param {object} user - 用户信息
+   */
+  function setAuth(authToken, user) {
+    token.value = authToken
+    userInfo.value = user
+    isLoggedIn.value = true
+    setToken(authToken)
+    setUser(user)
+  }
+
+  /**
    * 获取用户信息
    */
   async function getProfile() {
@@ -80,6 +93,7 @@ export const useUserStore = defineStore('user', () => {
     userInfo,
     isLoggedIn,
     login,
+    setAuth,
     getProfile,
     logout,
     isAuditPassed,

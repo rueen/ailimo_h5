@@ -139,8 +139,10 @@ import RegionPicker from '@/components/common/RegionPicker.vue'
 import { register, sendCode } from '@/api/auth'
 import { getOrganizations, getResearchGroups } from '@/api/common'
 import { validatePhone } from '@/utils/validate'
+import { useUserStore } from '@/stores/user'
 
 const router = useRouter()
+const userStore = useUserStore()
 
 /**
  * 表单数据
@@ -285,7 +287,7 @@ async function handleSendCode() {
 }
 
 /**
- * 注册
+ * 注册（注册成功后自动登录）
  */
 async function handleRegister() {
   try {
@@ -310,11 +312,18 @@ async function handleRegister() {
       data.address = formData.value.address
     }
 
-    await register(data)
-    showToast('注册成功，请等待审核')
+    // 注册接口返回 token 和 user，与登录接口结构一致
+    const result = await register(data)
+    
+    // 保存登录状态到 store（注册后自动登录）
+    userStore.setAuth(result.token, result.user)
+    
+    // 根据审核状态跳转
+    const auditStatus = result.user.audit_status
+    showToast('注册成功')
     setTimeout(() => {
-      router.replace('/login')
-    }, 1500)
+        router.replace('/home')
+      }, 1500)
   } catch (error) {
     console.error('注册失败:', error)
   } finally {
