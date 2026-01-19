@@ -1,12 +1,8 @@
 <template>
   <app-layout :show-header="false">
-    <div class="register-page">
+    <div class="register-page page-content">
+      <page-title title="用户注册" @back="router.back()" />
       <div class="register-container">
-        <!-- 顶部 -->
-        <div class="register-header">
-          <van-icon name="arrow-left" size="24" @click="goBack" />
-          <h1>用户注册</h1>
-        </div>
 
         <!-- 注册表单 -->
         <van-form @submit="handleRegister">
@@ -138,6 +134,7 @@ import { ref, computed, watch } from 'vue'
 import { useRouter } from 'vue-router'
 import { showToast } from 'vant'
 import AppLayout from '@/components/layout/AppLayout.vue'
+import PageTitle from '@/components/common/PageTitle.vue'
 import RegionPicker from '@/components/common/RegionPicker.vue'
 import { register, sendCode } from '@/api/auth'
 import { getOrganizations, getResearchGroups } from '@/api/common'
@@ -326,13 +323,6 @@ async function handleRegister() {
 }
 
 /**
- * 返回
- */
-function goBack() {
-  router.back()
-}
-
-/**
  * 去登录
  */
 function goLogin() {
@@ -363,19 +353,6 @@ onUnmounted(() => {
   .register-container {
     max-width: 600px;
     margin: 0 auto;
-  }
-
-  .register-header {
-    display: flex;
-    align-items: center;
-    gap: @padding-md;
-    margin-bottom: @padding-lg;
-
-    h1 {
-      font-size: @font-size-xl;
-      font-weight: 600;
-      color: var(--text-color);
-    }
   }
 
   .register-actions {

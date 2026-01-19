@@ -5,7 +5,7 @@
         <!-- Logo -->
         <div class="login-logo">
           <img :src="logoUrl" alt="艾力默" />
-          <h1>艾力默用户端</h1>
+          <h1>艾力默</h1>
         </div>
 
         <!-- 登录表单 -->
@@ -189,7 +189,7 @@ onUnmounted(() => {
   align-items: center;
   justify-content: center;
   min-height: 100vh;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: @primary-color1;
   padding: @padding-md;
 
   .login-container {
