@@ -27,7 +27,7 @@
           <div class="detail-section">
             <div class="section-title">设备信息</div>
             <van-cell-group>
-              <van-cell title="设备名称" :value="orderDetail.equipment?.name" />
+              <van-cell title="设备名称" :value="orderDetail.equipment?.name" is-link @click="router.push(`/equipment/${orderDetail.equipment_id}`)" />
               <van-cell v-if="orderDetail.remark" title="备注" :label="orderDetail.remark" />
             </van-cell-group>
           </div>
@@ -166,12 +166,13 @@
 
 <script setup>
 import { ref, onMounted } from 'vue'
-import { useRoute } from 'vue-router'
+import { useRoute, useRouter } from 'vue-router'
 import { showToast } from 'vant'
 import AppLayout from '@/components/layout/AppLayout.vue'
 import { getMyOrderDetail } from '@/api/order'
 
 const route = useRoute()
+const router = useRouter()
 const loading = ref(false)
 const orderDetail = ref(null)
 
