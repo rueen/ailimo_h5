@@ -89,12 +89,6 @@ function onLoad() {
 
 <style lang="less" scoped>
 .cases-page {
-  .page-title {
-    font-size: @font-size-xl;
-    font-weight: 600;
-    margin-bottom: @padding-lg;
-  }
-
   /* 多列网格：移动端 2 列，平板 3 列 */
   .case-grid {
     display: grid;

@@ -1,7 +1,7 @@
 <template>
   <app-layout>
     <div class="cage-page page-content">
-      <h2 class="page-title">笼位租赁</h2>
+      <page-title title="笼位租赁" @back="router.back()" />
       <van-form @submit="handleSubmit" ref="formRef">
         <van-cell-group>
           <!-- 动物类型 -->
@@ -143,6 +143,7 @@ import {
   getCagePurposes
 } from '@/api/common'
 import { useConfigStore } from '@/stores/config'
+import PageTitle from '@/components/common/PageTitle.vue'
 
 const router = useRouter()
 const configStore = useConfigStore()
@@ -501,16 +502,6 @@ async function handleSubmit() {
 
 <style lang="less" scoped>
 .cage-page {
-  .page-title {
-    font-size: @font-size-xl;
-    font-weight: 600;
-    margin-bottom: @padding-lg;
-    
-    @media (max-width: 767px) {
-      display: none;
-    }
-  }
-  
   .submit-btn {
     margin-top: @padding-lg;
   }

@@ -1,7 +1,7 @@
 <template>
   <app-layout>
     <div class="animal-page page-content">
-      <h2 class="page-title">动物订购</h2>
+      <page-title title="动物订购" @back="router.back()" />
       
       <van-form @submit="handleSubmit" ref="formRef">
         <van-cell-group>
@@ -239,6 +239,7 @@ import {
   getAnimalRequirements,
   getEnvironmentTypes
 } from '@/api/common'
+import PageTitle from '@/components/common/PageTitle.vue'
 
 const router = useRouter()
 const formRef = ref(null)
@@ -623,16 +624,6 @@ async function handleSubmit() {
 <style lang="less" scoped>
 .animal-page {
   padding-top: @padding-md;
-  
-  .page-title {
-    font-size: @font-size-xl;
-    font-weight: 600;
-    margin-bottom: @padding-lg;
-    
-    @media (max-width: 767px) {
-      display: none;
-    }
-  }
   
   .submit-section {
     margin-top: @padding-xl;

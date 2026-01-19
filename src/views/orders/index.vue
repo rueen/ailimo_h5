@@ -1,7 +1,7 @@
 <template>
   <app-layout>
     <div class="orders-page page-content">
-      <h2 class="page-title">我的订单</h2>
+      <page-title title="我的订单" @back="router.back()" />
 
       <van-list
         v-model:loading="loading"
@@ -45,6 +45,7 @@ import { useRouter } from 'vue-router'
 import AppLayout from '@/components/layout/AppLayout.vue'
 import EmptyState from '@/components/common/EmptyState.vue'
 import { getMyOrders } from '@/api/order'
+import PageTitle from '@/components/common/PageTitle.vue'
 
 const router = useRouter()
 const loading = ref(false)
@@ -129,17 +130,6 @@ function goDetail(order) {
 .orders-page {
   background-color: var(--bg-color);
   padding: @padding-md;
-
-  .page-title {
-    font-size: @font-size-xl;
-    font-weight: 600;
-    margin-bottom: @padding-lg;
-    color: var(--text-color);
-
-    @media (max-width: 767px) {
-      display: none;
-    }
-  }
 
   .order-card {
     background-color: var(--bg-color-white);

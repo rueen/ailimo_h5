@@ -1,7 +1,7 @@
 <template>
   <app-layout>
     <div class="experiment-page page-content">
-      <h2 class="page-title">实验代操作</h2>
+      <page-title title="实验代操作" @back="router.back()" />
       
       <van-form @submit="handleSubmit" ref="formRef">
         <van-cell-group>
@@ -106,6 +106,7 @@ import DateTimeSlotPicker from '@/components/common/DateTimeSlotPicker.vue'
 import { getExperimentTimeSlots, createExperimentOrder } from '@/api/experiment'
 import { getAnimalTypes, getOperationContents } from '@/api/common'
 import { useConfigStore } from '@/stores/config'
+import PageTitle from '@/components/common/PageTitle.vue'
 
 const router = useRouter()
 const configStore = useConfigStore()
@@ -356,16 +357,6 @@ async function handleSubmit() {
 <style lang="less" scoped>
 .experiment-page {
   padding-top: @padding-md;
-  
-  .page-title {
-    font-size: @font-size-xl;
-    font-weight: 600;
-    margin-bottom: @padding-lg;
-    
-    @media (max-width: 767px) {
-      display: none;
-    }
-  }
   
   .time-picker-section {
     margin: @padding-lg 0;

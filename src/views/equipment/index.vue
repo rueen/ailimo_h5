@@ -1,7 +1,7 @@
 <template>
   <app-layout>
     <div class="equipment-page page-content">
-      <h2 class="page-title">设备租赁</h2>
+      <page-title title="设备租赁" @back="router.back()" />
       <van-form @submit="handleSubmit">
         <van-cell-group>
           <!-- 设备选择 -->
@@ -73,6 +73,7 @@ import { ref, computed, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { showToast, showSuccessToast } from 'vant'
 import AppLayout from '@/components/layout/AppLayout.vue'
+import PageTitle from '@/components/common/PageTitle.vue'
 import DateTimeSlotPicker from '@/components/common/DateTimeSlotPicker.vue'
 import { getEquipmentList, getEquipmentAvailableSlots, createEquipmentOrder } from '@/api/equipment'
 import { useConfigStore } from '@/stores/config'
@@ -267,16 +268,6 @@ onMounted(() => {
 <style lang="less" scoped>
 .equipment-page {
   padding-top: @padding-md;
-
-  .page-title {
-    font-size: @font-size-xl;
-    font-weight: 600;
-    margin-bottom: @padding-lg;
-    
-    @media (max-width: 767px) {
-      display: none;
-    }
-  }
 
   .equipment-detail-btn {
     display: flex;

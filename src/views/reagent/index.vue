@@ -1,7 +1,7 @@
 <template>
   <app-layout>
     <div class="reagent-page page-content">
-      <h2 class="page-title">试剂耗材订购</h2>
+      <page-title title="试剂耗材订购" @back="router.back()" />
       
       <van-form @submit="handleSubmit" ref="formRef">
         <van-cell-group>
@@ -162,6 +162,7 @@ import {
   getReagentBrands,
   getReagentSpecifications
 } from '@/api/common'
+import PageTitle from '@/components/common/PageTitle.vue'
 
 const router = useRouter()
 const formRef = ref(null)
@@ -386,16 +387,6 @@ async function handleSubmit() {
 <style lang="less" scoped>
 .reagent-page {
   padding-top: @padding-md;
-  
-  .page-title {
-    font-size: @font-size-xl;
-    font-weight: 600;
-    margin-bottom: @padding-lg;
-    
-    @media (max-width: 767px) {
-      display: none;
-    }
-  }
   
   .submit-section {
     margin-top: @padding-xl;
