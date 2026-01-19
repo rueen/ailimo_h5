@@ -149,6 +149,16 @@ router.beforeEach((to, from, next) => {
       return
     }
 
+    // 检查账号是否被禁用
+    if (userStore.isDisabled()) {
+      showToast('账号已被禁用，请联系管理员')
+      // 如果是访问服务内页，跳转到个人中心
+      if (to.meta.requiresAudit) {
+        next('/my')
+        return
+      }
+    }
+
     // 需要审核通过的页面
     if (to.meta.requiresAudit) {
       if (!userStore.isAuditPassed()) {

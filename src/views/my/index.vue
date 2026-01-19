@@ -12,7 +12,10 @@
       <div class="user-header">
         <van-icon name="user-circle-o" size="48" color="#07C160" />
         <div class="user-info">
-          <h3>{{ userStore.userInfo?.name }}</h3>
+          <div class="user-name-row">
+            <h3>{{ userStore.userInfo?.name }}</h3>
+            <span class="user-status" :class="userStatusClass">{{ userStatusText }}</span>
+          </div>
           <p>{{ userStore.userInfo?.phone }}</p>
         </div>
       </div>
@@ -44,6 +47,7 @@
 </template>
 
 <script setup>
+import { onMounted, computed } from 'vue'
 import { useRouter } from 'vue-router'
 import { showConfirmDialog } from 'vant'
 import AppLayout from '@/components/layout/AppLayout.vue'
@@ -52,6 +56,29 @@ import { useUserStore } from '@/stores/user'
 const router = useRouter()
 const userStore = useUserStore()
 
+/**
+ * 用户状态文本
+ */
+const userStatusText = computed(() => {
+  const status = userStore.userInfo?.status
+  if (status === 0) return '已禁用'
+  if (status === 1) return '正常'
+  return '未知'
+})
+
+/**
+ * 用户状态样式类
+ */
+const userStatusClass = computed(() => {
+  const status = userStore.userInfo?.status
+  if (status === 0) return 'status-disabled'
+  if (status === 1) return 'status-normal'
+  return ''
+})
+
+/**
+ * 退出登录
+ */
 async function handleLogout() {
   showConfirmDialog({
     title: '提示',
@@ -63,6 +90,17 @@ async function handleLogout() {
     })
     .catch(() => {})
 }
+
+/**
+ * 页面加载时获取最新用户信息
+ */
+onMounted(async () => {
+  try {
+    await userStore.getProfile()
+  } catch (error) {
+    console.error('获取用户信息失败:', error)
+  }
+})
 </script>
 
 <style lang="less" scoped>
@@ -77,10 +115,36 @@ async function handleLogout() {
     margin-bottom: @padding-md;
 
     .user-info {
+      flex: 1;
+
+      .user-name-row {
+        display: flex;
+        align-items: center;
+        gap: @padding-xs;
+        margin-bottom: 4px;
+      }
+
       h3 {
         font-size: @font-size-lg;
         font-weight: 600;
-        margin-bottom: 4px;
+      }
+
+      .user-status {
+        display: inline-block;
+        padding: 2px 8px;
+        font-size: @font-size-xs;
+        border-radius: @border-radius-sm;
+        font-weight: 500;
+
+        &.status-normal {
+          color: @success-color;
+          background-color: rgba(7, 193, 96, 0.1);
+        }
+
+        &.status-disabled {
+          color: @danger-color;
+          background-color: rgba(238, 10, 36, 0.1);
+        }
       }
 
       p {

@@ -88,6 +88,20 @@ export const useUserStore = defineStore('user', () => {
     return userInfo.value?.audit_status === 2
   }
 
+  /**
+   * 检查账号是否被禁用
+   */
+  function isDisabled() {
+    return userInfo.value?.status === 0
+  }
+
+  /**
+   * 检查账号是否正常（未被禁用）
+   */
+  function isActive() {
+    return userInfo.value?.status === 1
+  }
+
   return {
     token,
     userInfo,
@@ -98,6 +112,8 @@ export const useUserStore = defineStore('user', () => {
     logout,
     isAuditPassed,
     needAudit,
-    isAuditRejected
+    isAuditRejected,
+    isDisabled,
+    isActive
   }
 })
