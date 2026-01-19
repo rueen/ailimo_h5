@@ -33,6 +33,42 @@ const routes = [
     meta: { title: '服务中心', requiresAuth: false, showTabbar: true }
   },
   {
+    path: '/services/equipment',
+    name: 'Equipment',
+    component: () => import('@/views/equipment/index.vue'),
+    meta: { title: '设备租赁', requiresAuth: true, requiresAudit: true }
+  },
+  {
+    path: '/services/equipment/:id',
+    name: 'EquipmentDetail',
+    component: () => import('@/views/equipment/detail.vue'),
+    meta: { title: '设备详情', requiresAuth: false }
+  },
+  {
+    path: '/services/cage',
+    name: 'Cage',
+    component: () => import('@/views/cage/index.vue'),
+    meta: { title: '笼位租赁', requiresAuth: true, requiresAudit: true }
+  },
+  {
+    path: '/services/experiment',
+    name: 'Experiment',
+    component: () => import('@/views/experiment/index.vue'),
+    meta: { title: '实验代操作', requiresAuth: true, requiresAudit: true }
+  },
+  {
+    path: '/services/animal',
+    name: 'Animal',
+    component: () => import('@/views/animal/index.vue'),
+    meta: { title: '动物订购', requiresAuth: true, requiresAudit: true }
+  },
+  {
+    path: '/services/reagent',
+    name: 'Reagent',
+    component: () => import('@/views/reagent/index.vue'),
+    meta: { title: '试剂耗材订购', requiresAuth: true, requiresAudit: true }
+  },
+  {
     path: '/cases',
     name: 'Cases',
     component: () => import('@/views/cases/index.vue'),
@@ -67,42 +103,6 @@ const routes = [
     name: 'AuditStatus',
     component: () => import('@/views/auth/audit-status.vue'),
     meta: { title: '审核状态', requiresAuth: true }
-  },
-  {
-    path: '/equipment',
-    name: 'Equipment',
-    component: () => import('@/views/equipment/index.vue'),
-    meta: { title: '设备租赁', requiresAuth: true, requiresAudit: true }
-  },
-  {
-    path: '/equipment/:id',
-    name: 'EquipmentDetail',
-    component: () => import('@/views/equipment/detail.vue'),
-    meta: { title: '设备详情', requiresAuth: false }
-  },
-  {
-    path: '/cage',
-    name: 'Cage',
-    component: () => import('@/views/cage/index.vue'),
-    meta: { title: '笼位租赁', requiresAuth: true, requiresAudit: true }
-  },
-  {
-    path: '/experiment',
-    name: 'Experiment',
-    component: () => import('@/views/experiment/index.vue'),
-    meta: { title: '实验代操作', requiresAuth: true, requiresAudit: true }
-  },
-  {
-    path: '/animal',
-    name: 'Animal',
-    component: () => import('@/views/animal/index.vue'),
-    meta: { title: '动物订购', requiresAuth: true, requiresAudit: true }
-  },
-  {
-    path: '/reagent',
-    name: 'Reagent',
-    component: () => import('@/views/reagent/index.vue'),
-    meta: { title: '试剂耗材订购', requiresAuth: true, requiresAudit: true }
   },
   {
     path: '/orders',

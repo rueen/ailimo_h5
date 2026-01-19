@@ -2,7 +2,7 @@
  * @Author: diaochan diaochan@seatent.com
  * @Date: 2026-01-17 19:16:32
  * @LastEditors: diaochan diaochan@seatent.com
- * @LastEditTime: 2026-01-18 21:31:18
+ * @LastEditTime: 2026-01-19 15:42:23
  * @FilePath: /ailimo_h5/src/views/services/index.vue
  * @Description: 这是默认设置,请设置`customMade`, 打开koroFileHeader查看配置 进行设置: https://github.com/OBKoro1/koro1FileHeader/wiki/%E9%85%8D%E7%BD%AE
 -->
@@ -35,31 +35,31 @@ const serviceList = [
     title: '设备租赁',
     description: '设备分类、设备名称、预约时间、使用用途',
     icon: 'https://ailimolab.oss-cn-hangzhou.aliyuncs.com/images/h5/device.png',
-    path: '/equipment'
+    path: '/services/equipment'
   },
   {
     title: '笼位租赁',
     description: '数量、预约时间、用途（短期实验、长期繁殖）',
     icon: 'https://ailimolab.oss-cn-hangzhou.aliyuncs.com/images/h5/cage.png',
-    path: '/cage'
+    path: '/services/cage'
   },
   {
     title: '实验代操作',
     description: '动物类型、数量、操作内容、预约时间',
     icon: 'https://ailimolab.oss-cn-hangzhou.aliyuncs.com/images/h5/operation.png',
-    path: '/experiment'
+    path: '/services/experiment'
   },
   {
     title: '动物订购',
     description: '品牌要求、种类/品系、规格、性别、到货日期等',
     icon: 'https://ailimolab.oss-cn-hangzhou.aliyuncs.com/images/h5/animal.png',
-    path: '/animal'
+    path: '/services/animal'
   },
   {
     title: '试剂耗材订购',
     description: '品牌要求、种类/品系、规格、性别、到货日期等',
     icon: 'https://ailimolab.oss-cn-hangzhou.aliyuncs.com/images/h5/reagent.png',
-    path: '/reagent'
+    path: '/services/reagent'
   }
 ]
 </script>

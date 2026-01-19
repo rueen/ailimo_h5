@@ -94,31 +94,31 @@ const serviceList = [
     title: '设备租赁',
     description: '专业仪器设备租赁服务，满足您的科研需求',
     icon: 'https://ailimolab.oss-cn-hangzhou.aliyuncs.com/images/h5/device.png',
-    path: '/equipment'
+    path: '/services/equipment'
   },
   {
     title: '笼位租赁',
     description: '提供短期和长期笼赁的实笼位租赁服务',
     icon: 'https://ailimolab.oss-cn-hangzhou.aliyuncs.com/images/h5/cage.png',
-    path: '/cage'
+    path: '/services/cage'
   },
   {
     title: '实验代操作',
     description: '动物实验、称重、灌胃、操作代等，可提供时付费',
     icon: 'https://ailimolab.oss-cn-hangzhou.aliyuncs.com/images/h5/operation.png',
-    path: '/experiment'
+    path: '/services/experiment'
   },
   {
     title: '动物订购',
     description: '优选实验动物，为优质康康提供更安全、快捷的品购服务',
     icon: 'https://ailimolab.oss-cn-hangzhou.aliyuncs.com/images/h5/animal.png',
-    path: '/animal'
+    path: '/services/animal'
   },
   {
     title: '试剂耗材订购',
     description: '品牌琳郎、种类齐全、价格、快速，可提供订购服务',
     icon: 'https://ailimolab.oss-cn-hangzhou.aliyuncs.com/images/h5/reagent.png',
-    path: '/reagent'
+    path: '/services/reagent'
   }
 ]
 
