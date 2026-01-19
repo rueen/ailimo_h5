@@ -28,7 +28,7 @@ npm run dev
 - ✅ 首页(Banner + 服务卡片)
 - ✅ 服务中心
 - ✅ 设备租赁(列表/详情/预约)
-- ✅ 笼位租赁
+- ✅ 笼位预约
 - ✅ 实验代操作
 - ✅ 动物订购
 - ✅ 试剂耗材订购
@@ -156,7 +156,7 @@ server {
 - [ ] GET /api/h5/my-orders/:type/:id - 获取订单详情
 
 ### 其他模块
-- [ ] POST /api/h5/cage-orders - 提交笼位租赁订单
+- [ ] POST /api/h5/cage-orders - 提交笼位预约订单
 - [ ] POST /api/h5/experiment-orders - 提交实验代操作订单
 - [ ] POST /api/h5/animal-orders - 提交动物订购订单
 - [ ] POST /api/h5/reagent-orders - 提交试剂耗材订单

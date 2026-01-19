@@ -41,7 +41,7 @@
           </div>
         </template>
 
-        <!-- 笼位租赁详情 -->
+        <!-- 笼位预约详情 -->
         <template v-else-if="orderDetail.type === 'cage'">
           <div class="detail-section">
             <div class="section-title">笼位信息</div>

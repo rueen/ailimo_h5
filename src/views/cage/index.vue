@@ -1,7 +1,7 @@
 <template>
   <app-layout>
     <div class="cage-page page-content">
-      <page-title title="笼位租赁" @back="router.back()" />
+      <page-title title="笼位预约" @back="router.back()" />
       <van-form @submit="handleSubmit" ref="formRef">
         <van-cell-group>
           <!-- 动物类型 -->

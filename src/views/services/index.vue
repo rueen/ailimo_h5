@@ -38,7 +38,7 @@ const serviceList = [
     path: '/services/equipment'
   },
   {
-    title: '笼位租赁',
+    title: '笼位预约',
     description: '数量、预约时间、用途（短期实验、长期繁殖）',
     icon: 'https://ailimolab.oss-cn-hangzhou.aliyuncs.com/images/h5/cage.png',
     path: '/services/cage'

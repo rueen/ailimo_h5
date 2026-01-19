@@ -48,7 +48,7 @@ const routes = [
     path: '/services/cage',
     name: 'Cage',
     component: () => import('@/views/cage/index.vue'),
-    meta: { title: '笼位租赁', requiresAuth: true, requiresAudit: true }
+    meta: { title: '笼位预约', requiresAuth: true, requiresAudit: true }
   },
   {
     path: '/services/experiment',

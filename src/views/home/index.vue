@@ -97,8 +97,8 @@ const serviceList = [
     path: '/services/equipment'
   },
   {
-    title: '笼位租赁',
-    description: '提供短期和长期笼赁的实笼位租赁服务',
+    title: '笼位预约',
+    description: '提供短期和长期笼赁的实笼位预约服务',
     icon: 'https://ailimolab.oss-cn-hangzhou.aliyuncs.com/images/h5/cage.png',
     path: '/services/cage'
   },

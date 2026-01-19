@@ -1,5 +1,5 @@
 /**
- * 笼位租赁相关 API
+ * 笼位预约相关 API
  */
 
 import request from '@/utils/request'
@@ -35,7 +35,7 @@ export function getCageAvailableTimeSlots(params) {
 }
 
 /**
- * 获取笼位租赁时间段列表
+ * 获取笼位预约时间段列表
  * @returns {Promise}
  */
 export function getCageTimeSlots() {
@@ -46,7 +46,7 @@ export function getCageTimeSlots() {
 }
 
 /**
- * 提交笼位租赁订单
+ * 提交笼位预约订单
  * @param {object} data - 订单数据
  * @returns {Promise}
  */
