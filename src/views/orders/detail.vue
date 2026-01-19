@@ -22,7 +22,7 @@
           </van-cell-group>
         </div>
 
-        <!-- 设备租赁详情 -->
+        <!-- 设备预约详情 -->
         <template v-if="orderDetail.type === 'equipment'">
           <div class="detail-section">
             <div class="section-title">设备信息</div>

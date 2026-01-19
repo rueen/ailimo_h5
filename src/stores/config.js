@@ -12,7 +12,7 @@ export const useConfigStore = defineStore('config', () => {
    * 提前预约天数配置
    */
   const advanceDays = ref({
-    equipment_advance_days: 7,      // 设备租赁提前预约天数
+    equipment_advance_days: 7,      // 设备预约提前预约天数
     cage_advance_days: 7,            // 笼位预约提前预约天数
     experiment_advance_days: 7       // 实验代操作提前预约天数
   })

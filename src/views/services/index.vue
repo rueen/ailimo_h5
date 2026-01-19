@@ -32,7 +32,7 @@ const router = useRouter()
 
 const serviceList = [
   {
-    title: '设备租赁',
+    title: '设备预约',
     description: '设备分类、设备名称、预约时间、使用用途',
     icon: 'https://ailimolab.oss-cn-hangzhou.aliyuncs.com/images/h5/device.png',
     path: '/services/equipment'

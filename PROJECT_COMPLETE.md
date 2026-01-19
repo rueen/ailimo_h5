@@ -33,7 +33,7 @@
 ### 4. 核心业务模块
 - ✅ 首页(Banner、核心服务、视频展示、优势展示)
 - ✅ 服务中心(5大服务入口)
-- ✅ 设备租赁(列表、详情、预约表单)
+- ✅ 设备预约(列表、详情、预约表单)
 - ✅ 笼位预约(预约表单)
 - ✅ 实验代操作(预约表单)
 - ✅ 动物订购(订购表单)
@@ -46,7 +46,7 @@
 ### 5. API 接口集成
 - ✅ 用户认证接口(auth.js)
 - ✅ 通用配置接口(common.js)
-- ✅ 设备租赁接口(equipment.js)
+- ✅ 设备预约接口(equipment.js)
 - ✅ 笼位预约接口(cage.js)
 - ✅ 实验代操作接口(experiment.js)
 - ✅ 动物订购接口(animal.js)
@@ -113,7 +113,7 @@ ailimo_h5/
 │   ├── api/                # API 接口封装
 │   │   ├── auth.js        # 用户认证
 │   │   ├── common.js      # 通用配置
-│   │   ├── equipment.js   # 设备租赁
+│   │   ├── equipment.js   # 设备预约
 │   │   ├── cage.js        # 笼位预约
 │   │   ├── experiment.js  # 实验代操作
 │   │   ├── animal.js      # 动物订购
@@ -139,7 +139,7 @@ ailimo_h5/
 │   │   ├── home/         # 首页
 │   │   ├── about/        # 公司概况
 │   │   ├── services/     # 服务中心
-│   │   ├── equipment/    # 设备租赁
+│   │   ├── equipment/    # 设备预约
 │   │   ├── cage/         # 笼位预约
 │   │   ├── experiment/   # 实验代操作
 │   │   ├── animal/       # 动物订购
@@ -227,7 +227,7 @@ ailimo_h5/
 ### 图片资源
 所有服务图标使用 OSS 地址:
 - Logo: `https://ailimolab.oss-cn-hangzhou.aliyuncs.com/images/h5/logo.png`
-- 设备租赁: `https://ailimolab.oss-cn-hangzhou.aliyuncs.com/images/h5/device.png`
+- 设备预约: `https://ailimolab.oss-cn-hangzhou.aliyuncs.com/images/h5/device.png`
 - 笼位预约: `https://ailimolab.oss-cn-hangzhou.aliyuncs.com/images/h5/cage.png`
 - 实验代操作: `https://ailimolab.oss-cn-hangzhou.aliyuncs.com/images/h5/operation.png`
 - 动物订购: `https://ailimolab.oss-cn-hangzhou.aliyuncs.com/images/h5/animal.png`

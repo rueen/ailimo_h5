@@ -27,7 +27,7 @@ npm run dev
 - ✅ 登录/注册页面
 - ✅ 首页(Banner + 服务卡片)
 - ✅ 服务中心
-- ✅ 设备租赁(列表/详情/预约)
+- ✅ 设备预约(列表/详情/预约)
 - ✅ 笼位预约
 - ✅ 实验代操作
 - ✅ 动物订购
@@ -145,11 +145,11 @@ server {
 - [ ] GET /api/h5/environment-types - 获取环境类型列表
 - [ ] GET /api/h5/animal-types - 获取动物类型列表
 
-### 设备租赁
+### 设备预约
 - [ ] GET /api/h5/equipment - 获取设备列表
 - [ ] GET /api/h5/equipment/:id - 获取设备详情
 - [ ] GET /api/h5/equipment/:id/available-slots - 查询可用时间段
-- [ ] POST /api/h5/equipment-orders - 提交设备租赁订单
+- [ ] POST /api/h5/equipment-orders - 提交设备预约订单
 
 ### 订单管理
 - [ ] GET /api/h5/my-orders - 获取我的所有订单

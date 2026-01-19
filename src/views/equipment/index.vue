@@ -1,7 +1,7 @@
 <template>
   <app-layout>
     <div class="equipment-page page-content">
-      <page-title title="设备租赁" @back="router.back()" />
+      <page-title title="设备预约" @back="router.back()" />
       <van-form @submit="handleSubmit">
         <van-cell-group>
           <!-- 设备选择 -->

@@ -91,8 +91,8 @@ const bannerImages = computed(() => {
  */
 const serviceList = [
   {
-    title: '设备租赁',
-    description: '专业仪器设备租赁服务，满足您的科研需求',
+    title: '设备预约',
+    description: '专业仪器设备预约服务，满足您的科研需求',
     icon: 'https://ailimolab.oss-cn-hangzhou.aliyuncs.com/images/h5/device.png',
     path: '/services/equipment'
   },

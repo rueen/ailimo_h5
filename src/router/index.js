@@ -36,7 +36,7 @@ const routes = [
     path: '/services/equipment',
     name: 'Equipment',
     component: () => import('@/views/equipment/index.vue'),
-    meta: { title: '设备租赁', requiresAuth: true, requiresAudit: true }
+    meta: { title: '设备预约', requiresAuth: true, requiresAudit: true }
   },
   {
     path: '/equipment/:id',

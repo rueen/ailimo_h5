@@ -1,5 +1,5 @@
 /**
- * 设备租赁相关 API
+ * 设备预约相关 API
  */
 
 import request from '@/utils/request'
@@ -46,7 +46,7 @@ export function getEquipmentAvailableSlots(id, params) {
 }
 
 /**
- * 获取设备租赁时间段列表
+ * 获取设备预约时间段列表
  * @returns {Promise}
  */
 export function getEquipmentTimeSlots() {
@@ -57,7 +57,7 @@ export function getEquipmentTimeSlots() {
 }
 
 /**
- * 提交设备租赁订单
+ * 提交设备预约订单
  * @param {object} data - 订单数据
  * @returns {Promise}
  */
