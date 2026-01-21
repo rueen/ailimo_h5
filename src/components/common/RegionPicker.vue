@@ -3,7 +3,7 @@
     <!-- PC 端使用三个级联的 select -->
     <template v-if="isPC">
       <div class="pc-region-wrapper">
-        <label class="pc-label required">所在地区</label>
+        <label class="pc-label required">收货地址</label>
         <div class="pc-select-group">
           <!-- 省份 -->
           <select
@@ -65,12 +65,12 @@
     <template v-else>
       <van-field
         :model-value="regionText"
-        label="所在地区"
+        label="收货地址"
         placeholder="请选择省市区"
         readonly
         is-link
         required
-        :rules="[{ required: true, message: '请选择所在地区' }]"
+        :rules="[{ required: true, message: '请选择收货地址' }]"
         @click="showPicker = true"
       />
       

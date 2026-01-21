@@ -120,7 +120,7 @@
             <div class="section-title">收货地址</div>
             <van-cell-group>
               <van-cell 
-                title="所在地区" 
+                title="收货地址" 
                 :value="getRegionText(orderDetail)" 
               />
               <van-cell title="详细地址" :label="orderDetail.address" />
@@ -154,7 +154,7 @@
             <div class="section-title">收货地址</div>
             <van-cell-group>
               <van-cell 
-                title="所在地区" 
+                title="收货地址" 
                 :value="getRegionText(orderDetail)" 
               />
               <van-cell title="详细地址" :label="orderDetail.address" />

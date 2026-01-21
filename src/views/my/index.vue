@@ -2,7 +2,7 @@
  * @Author: diaochan diaochan@seatent.com
  * @Date: 2026-01-17 19:16:48
  * @LastEditors: diaochan diaochan@seatent.com
- * @LastEditTime: 2026-01-18 20:34:59
+ * @LastEditTime: 2026-01-21 19:50:11
  * @FilePath: /ailimo_h5/src/views/my/index.vue
  * @Description: 这是默认设置,请设置`customMade`, 打开koroFileHeader查看配置 进行设置: https://github.com/OBKoro1/koro1FileHeader/wiki/%E9%85%8D%E7%BD%AE
 -->
@@ -26,7 +26,7 @@
         <van-cell title="课题组" :value="userStore.userInfo?.research_group?.name" />
         <van-cell
           v-if="userStore.userInfo?.province"
-          title="所在地区"
+          title="收货地址"
           :value="`${userStore.userInfo.province.name} ${userStore.userInfo.city.name} ${userStore.userInfo.district.name}`"
         />
         <van-cell v-if="userStore.userInfo?.address" title="详细地址" :label="userStore.userInfo.address" />
