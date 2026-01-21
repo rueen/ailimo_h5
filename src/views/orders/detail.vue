@@ -35,8 +35,7 @@
           <div class="detail-section">
             <div class="section-title">预约信息</div>
             <van-cell-group>
-              <van-cell title="预约日期" :value="orderDetail.reservation_date" />
-              <van-cell title="预约时段" :value="orderDetail.time_slots?.join('、')" />
+              <van-cell title="预约时间" :label="formatTimeSlots(orderDetail.time_slots)" />
             </van-cell-group>
           </div>
         </template>
@@ -57,8 +56,16 @@
           <div class="detail-section">
             <div class="section-title">预约信息</div>
             <van-cell-group>
-              <van-cell title="预约日期" :value="orderDetail.reservation_date" />
-              <van-cell title="预约时段" :value="orderDetail.time_slots?.join('、')" />
+              <van-cell 
+                v-if="orderDetail.time_slots && orderDetail.time_slots.length > 0"
+                title="预约时间" 
+                :label="formatTimeSlots(orderDetail.time_slots)" 
+              />
+              <van-cell 
+                v-else-if="orderDetail.reservation_date"
+                title="预约日期" 
+                :value="orderDetail.reservation_date" 
+              />
             </van-cell-group>
           </div>
         </template>
@@ -78,8 +85,7 @@
           <div class="detail-section">
             <div class="section-title">预约信息</div>
             <van-cell-group>
-              <van-cell title="预约日期" :value="orderDetail.reservation_date" />
-              <van-cell title="预约时段" :value="orderDetail.timeSlots?.join('、')" />
+              <van-cell title="预约时间" :label="formatTimeSlots(orderDetail.time_slots)" />
             </van-cell-group>
           </div>
         </template>
@@ -170,6 +176,7 @@ import { useRoute, useRouter } from 'vue-router'
 import { showToast } from 'vant'
 import AppLayout from '@/components/layout/AppLayout.vue'
 import { getMyOrderDetail } from '@/api/order'
+import { formatTimeSlotsDisplay } from '@/utils/timeSlot'
 
 const route = useRoute()
 const router = useRouter()
@@ -212,6 +219,15 @@ function getRegionText(order) {
   if (order.city?.name) parts.push(order.city.name)
   if (order.district?.name) parts.push(order.district.name)
   return parts.length > 0 ? parts.join(' ') : '-'
+}
+
+/**
+ * 格式化时间段显示
+ * @param {Array<string>} timeSlots - 时间段数组
+ * @returns {string} 格式化后的文本
+ */
+function formatTimeSlots(timeSlots) {
+  return formatTimeSlotsDisplay(timeSlots)
 }
 
 /**

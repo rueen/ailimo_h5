@@ -88,6 +88,7 @@ import { getExperimentTimeSlots, createExperimentOrder } from '@/api/experiment'
 import { getAnimalTypes, getOperationContents } from '@/api/common'
 import { useConfigStore } from '@/stores/config'
 import PageTitle from '@/components/common/PageTitle.vue'
+import { flattenTimeSlots, formatSlotsForConfirm } from '@/utils/timeSlot'
 
 const router = useRouter()
 const configStore = useConfigStore()
@@ -104,12 +105,9 @@ const formData = ref({
 })
 
 /**
- * 日期时间选择器的值
+ * 日期时间选择器的值 { "2026-01-10": [slot1, slot2], "2026-01-11": [slot3] }
  */
-const dateTimeValue = ref({
-  date: '',
-  slots: []
-})
+const dateTimeValue = ref({})
 
 /**
  * 操作内容选项
@@ -243,10 +241,7 @@ async function fetchTimeSlots(date) {
  * 重置日期时间选择
  */
 function resetDateTime() {
-  dateTimeValue.value = {
-    date: '',
-    slots: []
-  }
+  dateTimeValue.value = {}
 }
 
 /**
@@ -269,24 +264,35 @@ async function handleSubmit() {
       return
     }
     
-    // 验证日期
-    if (!dateTimeValue.value.date) {
-      showToast('请选择预约日期')
+    // 验证是否选择了日期和时间段
+    const selectedDates = Object.keys(dateTimeValue.value)
+    if (selectedDates.length === 0) {
+      showToast('请至少选择一个日期和时间段')
       return
     }
 
-    // 验证时间段
-    if (!dateTimeValue.value.slots || dateTimeValue.value.slots.length === 0) {
-      showToast('请至少选择一个时间段')
+    // 验证每个日期都有时间段
+    let hasEmptySlots = false
+    selectedDates.forEach(date => {
+      if (!dateTimeValue.value[date] || dateTimeValue.value[date].length === 0) {
+        hasEmptySlots = true
+      }
+    })
+    
+    if (hasEmptySlots) {
+      showToast('请为每个日期选择至少一个时间段')
       return
     }
     
     // 二次确认
+    const confirmMessage = `确认预约 ${formData.value.quantity} 只动物的实验代操作吗？\n\n预约信息：\n${formatSlotsForConfirm(dateTimeValue.value)}`
+    
     await showDialog({
       title: '确认提交',
-      message: `确认预约 ${formData.value.quantity} 只动物的实验代操作吗?`,
-      confirmButtonText: '确认',
-      cancelButtonText: '取消'
+      message: confirmMessage,
+      confirmButtonText: '确认提交',
+      cancelButtonText: '取消',
+      messageAlign: 'left'
     })
     
     submitting.value = true
@@ -296,8 +302,7 @@ async function handleSubmit() {
       operation_content_id: formData.value.operation_content_id,
       animal_type_id: formData.value.animal_type_id,
       quantity: Number(formData.value.quantity),
-      reservation_date: dateTimeValue.value.date,
-      time_slots: dateTimeValue.value.slots.map(slot => slot.display_time),
+      time_slots: flattenTimeSlots(dateTimeValue.value),
       remark: formData.value.remark
     }
     

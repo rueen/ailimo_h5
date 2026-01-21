@@ -46,6 +46,7 @@ import AppLayout from '@/components/layout/AppLayout.vue'
 import EmptyState from '@/components/common/EmptyState.vue'
 import { getMyOrders } from '@/api/order'
 import PageTitle from '@/components/common/PageTitle.vue'
+import { getDateRangeText } from '@/utils/timeSlot'
 
 const router = useRouter()
 const loading = ref(false)
@@ -71,6 +72,21 @@ function getStatusType(status) {
 }
 
 /**
+ * 处理订单数据，格式化日期显示
+ * @param {Array} orders - 订单列表
+ * @returns {Array} 处理后的订单列表
+ */
+function processOrders(orders) {
+  return orders.map(order => {
+    // 对于设备预约和实验代操作订单，从 time_slots 中提取日期
+    if ((order.type === 'equipment' || order.type === 'experiment') && order.time_slots) {
+      order.date = getDateRangeText(order.time_slots)
+    }
+    return order
+  })
+}
+
+/**
  * 加载订单列表
  */
 async function loadOrders() {
@@ -83,7 +99,10 @@ async function loadOrders() {
     const data = await getMyOrders(params)
     
     // 检查返回的数据
-    const list = data.list || []
+    let list = data.list || []
+    
+    // 处理订单数据
+    list = processOrders(list)
     
     if (page.value === 1) {
       orderList.value = list

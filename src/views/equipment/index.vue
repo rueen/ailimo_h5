@@ -61,13 +61,14 @@
 <script setup>
 import { ref, computed, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
-import { showToast, showSuccessToast } from 'vant'
+import { showToast, showSuccessToast, showDialog } from 'vant'
 import AppLayout from '@/components/layout/AppLayout.vue'
 import PageTitle from '@/components/common/PageTitle.vue'
 import UniversalPicker from '@/components/common/UniversalPicker.vue'
 import DateTimeSlotPicker from '@/components/common/DateTimeSlotPicker.vue'
 import { getEquipmentList, getEquipmentAvailableSlots, createEquipmentOrder } from '@/api/equipment'
 import { useConfigStore } from '@/stores/config'
+import { flattenTimeSlots, formatSlotsForConfirm } from '@/utils/timeSlot'
 
 const router = useRouter()
 const configStore = useConfigStore()
@@ -77,18 +78,13 @@ const configStore = useConfigStore()
  */
 const form = ref({
   equipment_id: null,
-  reservation_date: '',
-  time_slots: [],
   remark: ''
 })
 
 /**
- * 日期时间选择器的值
+ * 日期时间选择器的值 { "2026-01-10": [slot1, slot2], "2026-01-11": [slot3] }
  */
-const dateTimeValue = ref({
-  date: '',
-  slots: []
-})
+const dateTimeValue = ref({})
 
 /**
  * 设备列表
@@ -158,10 +154,7 @@ async function fetchTimeSlots(date) {
  */
 function onEquipmentChange({ selectedOption }) {
   // 清空之前选择的时间
-  dateTimeValue.value = {
-    date: '',
-    slots: []
-  }
+  dateTimeValue.value = {}
 }
 
 /**
@@ -185,27 +178,45 @@ async function handleSubmit() {
     return
   }
 
-  // 验证日期
-  if (!dateTimeValue.value.date) {
-    showToast('请选择预约日期')
+  // 验证是否选择了日期和时间段
+  const selectedDates = Object.keys(dateTimeValue.value)
+  if (selectedDates.length === 0) {
+    showToast('请至少选择一个日期和时间段')
     return
   }
 
-  // 验证时间段
-  if (!dateTimeValue.value.slots || dateTimeValue.value.slots.length === 0) {
-    showToast('请至少选择一个时间段')
+  // 验证每个日期都有时间段
+  let hasEmptySlots = false
+  selectedDates.forEach(date => {
+    if (!dateTimeValue.value[date] || dateTimeValue.value[date].length === 0) {
+      hasEmptySlots = true
+    }
+  })
+  
+  if (hasEmptySlots) {
+    showToast('请为每个日期选择至少一个时间段')
     return
-  }
-
-  // 组装提交数据
-  const submitData = {
-    equipment_id: form.value.equipment_id,
-    reservation_date: dateTimeValue.value.date,
-    time_slots: dateTimeValue.value.slots.map(slot => slot.display_time),
-    remark: form.value.remark
   }
 
   try {
+    // 显示确认对话框
+    const confirmMessage = `确认提交预约吗？\n\n预约信息：\n${formatSlotsForConfirm(dateTimeValue.value)}`
+    
+    await showDialog({
+      title: '确认提交',
+      message: confirmMessage,
+      confirmButtonText: '确认提交',
+      cancelButtonText: '取消',
+      messageAlign: 'left'
+    })
+
+    // 组装提交数据
+    const submitData = {
+      equipment_id: form.value.equipment_id,
+      time_slots: flattenTimeSlots(dateTimeValue.value),
+      remark: form.value.remark
+    }
+
     submitting.value = true
     await createEquipmentOrder(submitData)
     showSuccessToast('提交成功，请等待审核')
@@ -215,7 +226,9 @@ async function handleSubmit() {
       router.back()
     }, 1500)
   } catch (error) {
-    console.error('提交订单失败:', error)
+    if (error !== 'cancel') {
+      console.error('提交订单失败:', error)
+    }
   } finally {
     submitting.value = false
   }
