@@ -46,7 +46,7 @@ import AppLayout from '@/components/layout/AppLayout.vue'
 import EmptyState from '@/components/common/EmptyState.vue'
 import { getMyOrders } from '@/api/order'
 import PageTitle from '@/components/common/PageTitle.vue'
-import { getDateRangeText } from '@/utils/timeSlot'
+import { getDateRangeText, formatDateRange } from '@/utils/timeSlot'
 
 const router = useRouter()
 const loading = ref(false)
@@ -82,6 +82,12 @@ function processOrders(orders) {
     if ((order.type === 'equipment' || order.type === 'experiment') && order.time_slots) {
       order.date = getDateRangeText(order.time_slots)
     }
+    
+    // 对于笼位预约订单，格式化日期范围
+    if (order.type === 'cage' && order.start_date) {
+      order.date = formatDateRange(order.start_date, order.end_date)
+    }
+    
     return order
   })
 }

@@ -48,15 +48,38 @@
             show-word-limit
           />
           
-          <!-- 时间选择 -->
-          <div v-if="formData.animal_type_id && formData.environment_id" class="time-picker-section">
-            <date-time-slot-picker
-              v-model="dateTimeValue"
-              :advance-days="advanceDays"
-              :show-remaining="true"
-              :multiple="true"
-              :fetch-slots="fetchTimeSlots"
+          <!-- 日期选择区域 -->
+          <div v-if="formData.animal_type_id && formData.environment_id" class="date-picker-section">
+            <!-- 开始日期 -->
+            <universal-date-picker
+              v-model="formData.start_date"
+              label="开始日期"
+              placeholder="请选择开始日期"
+              title="选择开始日期"
+              required
+              :min-date="minDate"
+              :rules="[{ required: true, message: '请选择开始日期' }]"
             />
+            
+            <!-- 结束日期 -->
+            <universal-date-picker
+              v-model="formData.end_date"
+              label="结束日期"
+              placeholder="请选择结束日期"
+              title="选择结束日期"
+              :disabled="isLongTerm"
+              :min-date="endMinDate"
+            />
+            
+            <!-- 长期预约选项 -->
+            <van-cell>
+              <template #title>
+                <div class="long-term-checkbox">
+                  <van-checkbox v-model="isLongTerm" @change="onLongTermChange" />
+                  <span class="checkbox-label">长期预约</span>
+                </div>
+              </template>
+            </van-cell>
           </div>
           
           <!-- 可用数量提示 -->
@@ -87,6 +110,7 @@
             type="primary" 
             native-type="submit"
             :loading="submitLoading"
+            :disabled="availableQuantity === 0"
           >
             提交预约
           </van-button>
@@ -97,26 +121,24 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted } from 'vue'
+import { ref, computed, onMounted, watch } from 'vue'
 import { useRouter } from 'vue-router'
 import { showToast, showDialog } from 'vant'
 import AppLayout from '@/components/layout/AppLayout.vue'
 import UniversalPicker from '@/components/common/UniversalPicker.vue'
-import DateTimeSlotPicker from '@/components/common/DateTimeSlotPicker.vue'
+import UniversalDatePicker from '@/components/common/UniversalDatePicker.vue'
 import { 
   getEnvironmentsByAnimalType,
-  getCageAvailableTimeSlots,
+  getCageAvailableQuantity,
   createCageOrder 
 } from '@/api/cage'
 import { 
   getAnimalTypes, 
   getCagePurposes
 } from '@/api/common'
-import { useConfigStore } from '@/stores/config'
 import PageTitle from '@/components/common/PageTitle.vue'
 
 const router = useRouter()
-const configStore = useConfigStore()
 const formRef = ref(null)
 
 /**
@@ -125,17 +147,11 @@ const formRef = ref(null)
 const formData = ref({
   animal_type_id: null,
   environment_id: null,
+  start_date: '',
+  end_date: '',
   quantity: '',
   purpose_id: null,
   remark: ''
-})
-
-/**
- * 日期时间选择器的值
- */
-const dateTimeValue = ref({
-  date: '',
-  slots: []
 })
 
 /**
@@ -154,49 +170,57 @@ const environmentOptions = ref([])
 const purposeOptions = ref([])
 
 /**
- * 时间段列表（缓存当前日期的时间段数据）
- */
-const currentTimeSlots = ref([])
-
-/**
  * 提交状态
  */
 const submitLoading = ref(false)
 
 /**
- * 提前预约天数（从全局配置获取）
+ * 是否长期预约
  */
-const advanceDays = computed(() => {
-  return configStore.advanceDays.cage_advance_days || 7
+const isLongTerm = ref(false)
+
+/**
+ * 最小日期（今天）
+ */
+const minDate = new Date()
+
+/**
+ * 结束日期的最小日期（开始日期）
+ */
+const endMinDate = computed(() => {
+  if (formData.value.start_date) {
+    return new Date(formData.value.start_date)
+  }
+  return new Date()
 })
+
+/**
+ * 可用数量
+ */
+const availableQuantity = ref(null)
+
+/**
+ * 是否正在查询可用数量
+ */
+const loadingQuantity = ref(false)
+
+/**
+ * 防抖定时器
+ */
+let debounceTimer = null
 
 /**
  * 是否显示数量提示
  */
 const showQuantityHint = computed(() => {
-  return dateTimeValue.value.slots.length > 0 && currentTimeSlots.value.length > 0
+  return formData.value.start_date && availableQuantity.value !== null
 })
 
 /**
  * 是否显示数量输入框
  */
 const showQuantityInput = computed(() => {
-  return dateTimeValue.value.slots.length > 0
-})
-
-/**
- * 可用数量(取所选时间段中的最小可用数量)
- */
-const availableQuantity = computed(() => {
-  if (dateTimeValue.value.slots.length === 0 || currentTimeSlots.value.length === 0) {
-    return 0
-  }
-  
-  const quantities = dateTimeValue.value.slots.map(slot => {
-    return slot.remaining || 0
-  })
-  
-  return Math.min(...quantities)
+  return formData.value.start_date && (isLongTerm.value || formData.value.end_date)
 })
 
 /**
@@ -223,10 +247,27 @@ const quantityRules = computed(() => [
 onMounted(async () => {
   await Promise.all([
     loadAnimalTypes(),
-    loadPurposes(),
-    configStore.loadAdvanceDays()
+    loadPurposes()
   ])
 })
+
+/**
+ * 监听日期变化，查询可用数量
+ */
+watch(
+  () => [formData.value.animal_type_id, formData.value.environment_id, formData.value.start_date, formData.value.end_date, isLongTerm.value],
+  () => {
+    // 清空旧的防抖定时器
+    if (debounceTimer) {
+      clearTimeout(debounceTimer)
+    }
+    
+    // 300ms 防抖
+    debounceTimer = setTimeout(() => {
+      fetchAvailableQuantity()
+    }, 300)
+  }
+)
 
 /**
  * 加载动物类型列表
@@ -307,40 +348,62 @@ async function loadEnvironmentsByAnimalType() {
  * 环境类型改变事件
  */
 function onEnvironmentChange({ selectedOption }) {
-  // 清空时间选择
+  // 清空日期和数量
   resetDateTime()
 }
 
 /**
- * 获取时间段数据（供DateTimeSlotPicker组件调用）
- * @param {string} date - 日期
+ * 长期预约改变事件
  */
-async function fetchTimeSlots(date) {
-  if (!formData.value.animal_type_id || !formData.value.environment_id) {
-    return []
+function onLongTermChange(checked) {
+  if (checked) {
+    // 勾选长期预约，清空结束日期
+    formData.value.end_date = ''
+  }
+}
+
+/**
+ * 查询可用数量
+ */
+async function fetchAvailableQuantity() {
+  // 必须选择动物类型、环境类型和开始日期
+  if (!formData.value.animal_type_id || !formData.value.environment_id || !formData.value.start_date) {
+    availableQuantity.value = null
+    return
+  }
+  
+  // 如果不是长期预约，必须选择结束日期
+  if (!isLongTerm.value && !formData.value.end_date) {
+    availableQuantity.value = null
+    return
   }
   
   try {
-    const data = await getCageAvailableTimeSlots({
+    loadingQuantity.value = true
+    
+    const params = {
       animal_type_id: formData.value.animal_type_id,
       environment_id: formData.value.environment_id,
-      date
-    })
+      start_date: formData.value.start_date
+    }
     
-    // 转换数据格式，添加remaining字段
-    const slots = (data.time_slots || []).map(slot => ({
-      ...slot,
-      available: slot.available_quantity > 0,
-      remaining: slot.available_quantity
-    }))
+    // 如果不是长期预约，传递结束日期
+    if (!isLongTerm.value && formData.value.end_date) {
+      params.end_date = formData.value.end_date
+    }
     
-    // 缓存当前时间段数据
-    currentTimeSlots.value = slots
+    const data = await getCageAvailableQuantity(params)
+    availableQuantity.value = data.available_quantity || 0
     
-    return slots
+    // 如果可用数量为0，提示用户
+    if (availableQuantity.value === 0) {
+      showToast('该时间段笼位已满，请选择其他时间')
+    }
   } catch (error) {
-    console.error('加载时间段失败:', error)
-    throw error
+    console.error('查询可用数量失败:', error)
+    availableQuantity.value = null
+  } finally {
+    loadingQuantity.value = false
   }
 }
 
@@ -357,12 +420,11 @@ function resetFromEnvironment() {
  * 重置日期时间选择
  */
 function resetDateTime() {
-  dateTimeValue.value = {
-    date: '',
-    slots: []
-  }
-  currentTimeSlots.value = []
+  formData.value.start_date = ''
+  formData.value.end_date = ''
   formData.value.quantity = ''
+  isLongTerm.value = false
+  availableQuantity.value = null
 }
 
 /**
@@ -373,22 +435,34 @@ async function handleSubmit() {
     // 表单验证
     await formRef.value?.validate()
     
-    // 验证日期
-    if (!dateTimeValue.value.date) {
-      showToast('请选择预约日期')
+    // 验证开始日期
+    if (!formData.value.start_date) {
+      showToast('请选择开始日期')
       return
     }
-
-    // 验证时间段
-    if (!dateTimeValue.value.slots || dateTimeValue.value.slots.length === 0) {
-      showToast('请至少选择一个时间段')
+    
+    // 验证结束日期（非长期预约时）
+    if (!isLongTerm.value && !formData.value.end_date) {
+      showToast('请选择结束日期或勾选长期预约')
+      return
+    }
+    
+    // 验证可用数量
+    if (availableQuantity.value === null) {
+      showToast('正在查询可用数量，请稍候')
+      return
+    }
+    
+    if (availableQuantity.value === 0) {
+      showToast('该时间段笼位已满，无法预约')
       return
     }
     
     // 二次确认
+    const period = isLongTerm.value ? '长期预约' : `${formData.value.start_date} 至 ${formData.value.end_date}`
     await showDialog({
       title: '确认提交',
-      message: `确认预约 ${formData.value.quantity} 个笼位吗?`,
+      message: `确认预约 ${formData.value.quantity} 个笼位吗?\n预约期限: ${period}`,
       confirmButtonText: '确认',
       cancelButtonText: '取消'
     })
@@ -401,8 +475,8 @@ async function handleSubmit() {
       environment_id: formData.value.environment_id,
       quantity: Number(formData.value.quantity),
       purpose_id: formData.value.purpose_id,
-      reservation_date: dateTimeValue.value.date,
-      time_slots: dateTimeValue.value.slots.map(slot => slot.display_time),
+      start_date: formData.value.start_date,
+      end_date: isLongTerm.value ? null : formData.value.end_date,
       remark: formData.value.remark
     }
     
@@ -440,11 +514,19 @@ async function handleSubmit() {
     color: @danger-color;
   }
   
-  .time-picker-section {
-    margin: @padding-lg 0;
-    padding: @padding-md;
+  .date-picker-section {
     background-color: var(--bg-color-white);
-    border-radius: @border-radius-md;
+    
+    .long-term-checkbox {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      
+      .checkbox-label {
+        font-size: 14px;
+        color: var(--text-color);
+      }
+    }
   }
   
   :deep(.van-cell-group) {

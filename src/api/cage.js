@@ -19,29 +19,20 @@ export function getEnvironmentsByAnimalType(params) {
 }
 
 /**
- * 查询笼位可用时间段
+ * 查询笼位剩余可用数量
  * @param {object} params - 查询参数
  * @param {number} params.animal_type_id - 动物类型ID
  * @param {number} params.environment_id - 环境ID
- * @param {string} params.date - 查询日期
+ * @param {string} params.start_date - 开始日期，格式：YYYY-MM-DD
+ * @param {string} [params.end_date] - 结束日期，格式：YYYY-MM-DD，不传或传null表示查询长期预约的可用性
+ * @param {number} [params.exclude_reservation_id] - 需要排除的订单ID（编辑订单时使用）
  * @returns {Promise}
  */
-export function getCageAvailableTimeSlots(params) {
+export function getCageAvailableQuantity(params) {
   return request({
-    url: '/h5/cages/available-time-slots',
+    url: '/h5/cages/available-quantity',
     method: 'get',
     params
-  })
-}
-
-/**
- * 获取笼位预约时间段列表
- * @returns {Promise}
- */
-export function getCageTimeSlots() {
-  return request({
-    url: '/h5/cage-time-slots',
-    method: 'get'
   })
 }
 

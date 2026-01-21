@@ -147,3 +147,71 @@ export function getFirstDate(timeSlots) {
   const parts = timeSlots[0].split(' ')
   return parts.length === 2 ? parts[0] : '-'
 }
+
+/**
+ * 计算两个日期之间的天数
+ * @param {string} startDate - 开始日期，格式：YYYY-MM-DD
+ * @param {string} endDate - 结束日期，格式：YYYY-MM-DD
+ * @returns {number} - 天数（包含开始和结束日期）
+ */
+export function calculateDaysBetween(startDate, endDate) {
+  if (!startDate || !endDate) {
+    return 0
+  }
+  
+  const start = new Date(startDate)
+  const end = new Date(endDate)
+  const diffTime = Math.abs(end - start)
+  const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24))
+  
+  return diffDays + 1 // 包含开始和结束日期
+}
+
+/**
+ * 格式化日期范围显示（用于笼位预约订单列表）
+ * @param {string} startDate - 开始日期，格式：YYYY-MM-DD
+ * @param {string|null} endDate - 结束日期，格式：YYYY-MM-DD，null表示长期预约
+ * @returns {string} - 格式化后的文本
+ */
+export function formatDateRange(startDate, endDate) {
+  if (!startDate) {
+    return '-'
+  }
+  
+  // 长期预约
+  if (!endDate || endDate === null) {
+    return `${startDate} 至 长期`
+  }
+  
+  // 计算天数
+  const days = calculateDaysBetween(startDate, endDate)
+  
+  return `${startDate} - ${endDate} (${days}天)`
+}
+
+/**
+ * 获取预约期限文本（用于订单详情）
+ * @param {string} startDate - 开始日期，格式：YYYY-MM-DD
+ * @param {string|null} endDate - 结束日期，格式：YYYY-MM-DD，null表示长期预约
+ * @returns {string} - 预约期限文本
+ */
+export function getReservationPeriod(startDate, endDate) {
+  if (!startDate) {
+    return '-'
+  }
+  
+  // 长期预约
+  if (!endDate || endDate === null) {
+    return '长期预约'
+  }
+  
+  // 单日预约
+  if (startDate === endDate) {
+    return '单日预约'
+  }
+  
+  // 计算天数
+  const days = calculateDaysBetween(startDate, endDate)
+  
+  return `${days}天`
+}

@@ -57,14 +57,15 @@
             <div class="section-title">预约信息</div>
             <van-cell-group>
               <van-cell 
-                v-if="orderDetail.time_slots && orderDetail.time_slots.length > 0"
-                title="预约时间" 
-                :label="formatTimeSlots(orderDetail.time_slots)" 
+                v-if="orderDetail.start_date"
+                title="开始日期" 
+                :value="orderDetail.start_date" 
               />
               <van-cell 
-                v-else-if="orderDetail.reservation_date"
-                title="预约日期" 
-                :value="orderDetail.reservation_date" 
+                v-if="orderDetail.start_date"
+                title="结束日期" 
+                :value="formatEndDate(orderDetail.end_date)"
+                :label="getReservationPeriodText(orderDetail.start_date, orderDetail.end_date)"
               />
             </van-cell-group>
           </div>
@@ -176,7 +177,7 @@ import { useRoute, useRouter } from 'vue-router'
 import { showToast } from 'vant'
 import AppLayout from '@/components/layout/AppLayout.vue'
 import { getMyOrderDetail } from '@/api/order'
-import { formatTimeSlotsDisplay } from '@/utils/timeSlot'
+import { formatTimeSlotsDisplay, getReservationPeriod } from '@/utils/timeSlot'
 
 const route = useRoute()
 const router = useRouter()
@@ -228,6 +229,28 @@ function getRegionText(order) {
  */
 function formatTimeSlots(timeSlots) {
   return formatTimeSlotsDisplay(timeSlots)
+}
+
+/**
+ * 格式化结束日期显示
+ * @param {string|null} endDate - 结束日期
+ * @returns {string} 格式化后的文本
+ */
+function formatEndDate(endDate) {
+  if (!endDate || endDate === null) {
+    return '长期'
+  }
+  return endDate
+}
+
+/**
+ * 获取预约期限文本
+ * @param {string} startDate - 开始日期
+ * @param {string|null} endDate - 结束日期
+ * @returns {string} 预约期限文本
+ */
+function getReservationPeriodText(startDate, endDate) {
+  return getReservationPeriod(startDate, endDate)
 }
 
 /**
