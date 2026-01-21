@@ -26,7 +26,7 @@ npm run dev
 ### 📱 移动端页面
 - ✅ 登录/注册页面
 - ✅ 首页(Banner + 服务卡片)
-- ✅ 服务中心
+- ✅ 动物服务
 - ✅ 设备预约(列表/详情/预约)
 - ✅ 笼位预约
 - ✅ 实验代操作
@@ -123,7 +123,7 @@ server {
 
 ```
 首页: https://yourdomain.com/#/home
-服务中心: https://yourdomain.com/#/services
+动物服务: https://yourdomain.com/#/services
 我的订单: https://yourdomain.com/#/orders
 个人中心: https://yourdomain.com/#/my
 ```
