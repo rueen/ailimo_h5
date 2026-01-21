@@ -43,9 +43,23 @@ export function getOrganizations() {
 }
 
 /**
- * 根据组织机构获取课题组列表
+ * 根据组织机构获取学院列表
  * @param {object} params - 查询参数
  * @param {number} params.organization_id - 组织机构ID
+ * @returns {Promise}
+ */
+export function getDepartments(params) {
+  return request({
+    url: '/h5/departments',
+    method: 'get',
+    params
+  })
+}
+
+/**
+ * 根据学院获取课题组列表
+ * @param {object} params - 查询参数
+ * @param {number} params.department_id - 学院ID
  * @returns {Promise}
  */
 export function getResearchGroups(params) {

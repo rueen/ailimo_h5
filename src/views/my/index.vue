@@ -23,6 +23,7 @@
       <van-cell-group>
         <van-cell title="用户编号" :value="userStore.userInfo?.user_no" />
         <van-cell title="组织机构" :value="userStore.userInfo?.organization?.name" />
+        <van-cell title="学院" :value="userStore.userInfo?.department?.name" />
         <van-cell title="课题组" :value="userStore.userInfo?.research_group?.name" />
         <van-cell
           v-if="userStore.userInfo?.province"
