@@ -77,7 +77,7 @@ const logoUrl = 'https://ailimolab.oss-cn-hangzhou.aliyuncs.com/images/h5/logo.p
 const navList = [
   { title: '首页', path: '/home' },
   { title: '公司概况', path: '/about' },
-  { title: '动物服务', path: '/services' },
+  { title: '服务中心', path: '/services' },
   { title: '案例展示', path: '/cases' }
 ]
 

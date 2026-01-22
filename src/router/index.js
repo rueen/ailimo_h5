@@ -30,7 +30,7 @@ const routes = [
     path: '/services',
     name: 'Services',
     component: () => import('@/views/services/index.vue'),
-    meta: { title: '动物服务', requiresAuth: false, showTabbar: true }
+    meta: { title: '服务中心', requiresAuth: false, showTabbar: true }
   },
   {
     path: '/services/equipment',

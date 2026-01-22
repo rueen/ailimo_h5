@@ -152,7 +152,7 @@ const isPc = computed(() => {
 })
 
 /**
- * 去动物服务
+ * 去服务中心
  */
 function goServices() {
   router.push('/services')
