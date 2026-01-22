@@ -49,15 +49,15 @@
               </template>
             </van-field>
             
-            <van-field
-              v-model="organizationText"
-              is-link
-              readonly
-              name="organization"
+            <universal-picker
+              v-model="formData.organization_id"
+              :columns="organizationList"
               label="组织机构"
               placeholder="请选择组织机构"
               :rules="[{ required: true, message: '请选择组织机构' }]"
-              @click="showOrganizationPicker = true"
+              :loading="organizationLoading"
+              required
+              @confirm="onConfirmOrganization"
             />
             <!-- 组织机构选择"其他"时显示输入框 -->
             <van-field
@@ -77,16 +77,16 @@
               ]"
             />
             
-            <van-field
-              v-model="departmentText"
-              is-link
-              readonly
-              name="department"
+            <universal-picker
+              v-model="formData.department_id"
+              :columns="departmentList"
               label="学院"
               placeholder="请选择学院"
               :disabled="!isOrganizationSelected"
               :rules="[{ required: true, message: '请选择学院' }]"
-              @click="handleDepartmentClick"
+              :loading="departmentLoading"
+              required
+              @confirm="onConfirmDepartment"
             />
             <!-- 学院选择"其他"时显示输入框 -->
             <van-field
@@ -106,16 +106,16 @@
               ]"
             />
             
-            <van-field
-              v-model="researchGroupText"
-              is-link
-              readonly
-              name="researchGroup"
+            <universal-picker
+              v-model="formData.research_group_id"
+              :columns="researchGroupList"
               label="课题组"
               placeholder="请选择课题组"
               :disabled="!isDepartmentSelected"
               :rules="[{ required: true, message: '请选择课题组' }]"
-              @click="handleResearchGroupClick"
+              :loading="researchGroupLoading"
+              required
+              @confirm="onConfirmResearchGroup"
             />
             <!-- 课题组选择"其他"时显示输入框 -->
             <van-field
@@ -170,36 +170,6 @@
           <a @click="goLogin">立即登录</a>
         </div>
       </div>
-
-      <!-- 组织机构选择器 -->
-      <van-popup v-model:show="showOrganizationPicker" position="bottom">
-        <van-picker
-          title="选择组织机构"
-          :columns="organizationList"
-          @confirm="onConfirmOrganization"
-          @cancel="showOrganizationPicker = false"
-        />
-      </van-popup>
-
-      <!-- 学院选择器 -->
-      <van-popup v-model:show="showDepartmentPicker" position="bottom">
-        <van-picker
-          title="选择学院"
-          :columns="departmentList"
-          @confirm="onConfirmDepartment"
-          @cancel="showDepartmentPicker = false"
-        />
-      </van-popup>
-
-      <!-- 课题组选择器 -->
-      <van-popup v-model:show="showResearchGroupPicker" position="bottom">
-        <van-picker
-          title="选择课题组"
-          :columns="researchGroupList"
-          @confirm="onConfirmResearchGroup"
-          @cancel="showResearchGroupPicker = false"
-        />
-      </van-popup>
     </div>
   </app-layout>
 </template>
@@ -211,6 +181,7 @@ import { showToast } from 'vant'
 import AppLayout from '@/components/layout/AppLayout.vue'
 import PageTitle from '@/components/common/PageTitle.vue'
 import RegionPicker from '@/components/common/RegionPicker.vue'
+import UniversalPicker from '@/components/common/UniversalPicker.vue'
 import { register, sendCode } from '@/api/auth'
 import { getOrganizations, getDepartments, getResearchGroups } from '@/api/common'
 import { validatePhone } from '@/utils/validate'
@@ -250,32 +221,20 @@ let timer = null
 /**
  * 组织机构相关
  */
-const showOrganizationPicker = ref(false)
 const organizationList = ref([])
-const organizationText = computed(() => {
-  const item = organizationList.value.find((o) => o.value === formData.value.organization_id)
-  return item ? item.text : ''
-})
+const organizationLoading = ref(false)
 
 /**
  * 学院相关
  */
-const showDepartmentPicker = ref(false)
 const departmentList = ref([])
-const departmentText = computed(() => {
-  const item = departmentList.value.find((d) => d.value === formData.value.department_id)
-  return item ? item.text : ''
-})
+const departmentLoading = ref(false)
 
 /**
  * 课题组相关
  */
-const showResearchGroupPicker = ref(false)
 const researchGroupList = ref([])
-const researchGroupText = computed(() => {
-  const item = researchGroupList.value.find((r) => r.value === formData.value.research_group_id)
-  return item ? item.text : ''
-})
+const researchGroupLoading = ref(false)
 
 /**
  * 是否已选择组织机构（包括选择"其他"并输入）
@@ -296,6 +255,7 @@ const isDepartmentSelected = computed(() => {
  */
 async function loadOrganizations() {
   try {
+    organizationLoading.value = true
     const list = await getOrganizations()
     organizationList.value = list.map((item) => ({
       text: item.name,
@@ -305,6 +265,8 @@ async function loadOrganizations() {
     organizationList.value.push({ text: '其他', value: 0 })
   } catch (error) {
     console.error('加载组织机构失败:', error)
+  } finally {
+    organizationLoading.value = false
   }
 }
 
@@ -325,6 +287,7 @@ async function loadDepartments() {
   }
 
   try {
+    departmentLoading.value = true
     const list = await getDepartments({
       organization_id: formData.value.organization_id
     })
@@ -336,6 +299,8 @@ async function loadDepartments() {
     departmentList.value.push({ text: '其他', value: 0 })
   } catch (error) {
     console.error('加载学院失败:', error)
+  } finally {
+    departmentLoading.value = false
   }
 }
 
@@ -356,6 +321,7 @@ async function loadResearchGroups() {
   }
 
   try {
+    researchGroupLoading.value = true
     const list = await getResearchGroups({
       department_id: formData.value.department_id
     })
@@ -367,15 +333,16 @@ async function loadResearchGroups() {
     researchGroupList.value.push({ text: '其他', value: 0 })
   } catch (error) {
     console.error('加载课题组失败:', error)
+  } finally {
+    researchGroupLoading.value = false
   }
 }
 
 /**
  * 选择组织机构
  */
-function onConfirmOrganization({ selectedValues }) {
-  const newValue = selectedValues[0]
-  formData.value.organization_id = newValue
+function onConfirmOrganization({ selectedOption }) {
+  const newValue = selectedOption.value
   
   // 清空学院和课题组的所有选择
   formData.value.department_id = null
@@ -383,14 +350,12 @@ function onConfirmOrganization({ selectedValues }) {
   formData.value.user_input_department_name = null
   formData.value.user_input_research_group_name = null
   
-  // 如果选择了"其他"，清空用户输入字段以外的内容
+  // 如果选择了"其他"，清空用户输入字段
   if (newValue === 0) {
     formData.value.user_input_organization_name = null
   } else {
     formData.value.user_input_organization_name = null
   }
-  
-  showOrganizationPicker.value = false
   
   // 加载学院列表
   loadDepartments()
@@ -399,22 +364,19 @@ function onConfirmOrganization({ selectedValues }) {
 /**
  * 选择学院
  */
-function onConfirmDepartment({ selectedValues }) {
-  const newValue = selectedValues[0]
-  formData.value.department_id = newValue
+function onConfirmDepartment({ selectedOption }) {
+  const newValue = selectedOption.value
   
   // 清空课题组的所有选择
   formData.value.research_group_id = null
   formData.value.user_input_research_group_name = null
   
-  // 如果选择了"其他"，清空用户输入字段以外的内容
+  // 如果选择了"其他"，清空用户输入字段
   if (newValue === 0) {
     formData.value.user_input_department_name = null
   } else {
     formData.value.user_input_department_name = null
   }
-  
-  showDepartmentPicker.value = false
   
   // 加载课题组列表
   loadResearchGroups()
@@ -423,9 +385,8 @@ function onConfirmDepartment({ selectedValues }) {
 /**
  * 选择课题组
  */
-function onConfirmResearchGroup({ selectedValues }) {
-  const newValue = selectedValues[0]
-  formData.value.research_group_id = newValue
+function onConfirmResearchGroup({ selectedOption }) {
+  const newValue = selectedOption.value
   
   // 如果选择了"其他"，清空用户输入字段
   if (newValue === 0) {
@@ -433,30 +394,6 @@ function onConfirmResearchGroup({ selectedValues }) {
   } else {
     formData.value.user_input_research_group_name = null
   }
-  
-  showResearchGroupPicker.value = false
-}
-
-/**
- * 点击学院选择器
- */
-function handleDepartmentClick() {
-  if (!isOrganizationSelected.value) {
-    showToast('请先选择组织机构')
-    return
-  }
-  showDepartmentPicker.value = true
-}
-
-/**
- * 点击课题组选择器
- */
-function handleResearchGroupClick() {
-  if (!isDepartmentSelected.value) {
-    showToast('请先选择学院')
-    return
-  }
-  showResearchGroupPicker.value = true
 }
 
 /**

@@ -51,7 +51,6 @@ request.interceptors.response.use(
     // 业务错误
     showToast({
       message: message || '请求失败',
-      icon: 'fail'
     })
     return Promise.reject(new Error(message || '请求失败'))
   },
@@ -79,7 +78,6 @@ request.interceptors.response.use(
           // 无权限
           showToast({
             message: '没有权限访问',
-            icon: 'fail'
           })
           break
 
@@ -87,7 +85,6 @@ request.interceptors.response.use(
           // 资源不存在
           showToast({
             message: '请求的资源不存在',
-            icon: 'fail'
           })
           break
 
@@ -95,7 +92,6 @@ request.interceptors.response.use(
           // 请求频率超限
           showToast({
             message: '请求过于频繁，请稍后再试',
-            icon: 'fail'
           })
           break
 
@@ -103,27 +99,23 @@ request.interceptors.response.use(
           // 服务器错误
           showToast({
             message: data?.message || '服务器错误',
-            icon: 'fail'
           })
           break
 
         default:
           showToast({
             message: data?.message || '请求失败',
-            icon: 'fail'
           })
       }
     } else if (error.request) {
       // 请求已发送但没有收到响应
       showToast({
         message: '网络连接失败，请检查网络',
-        icon: 'fail'
       })
     } else {
       // 其他错误
       showToast({
         message: error.message || '请求失败',
-        icon: 'fail'
       })
     }
 
