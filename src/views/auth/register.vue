@@ -1,7 +1,7 @@
 <template>
   <app-layout :show-header="false">
     <div class="register-page page-content">
-      <page-title title="用户注册" @back="router.back()" />
+      <page-title title="用户注册" @back="goHome" />
       <div class="register-container">
 
         <!-- 注册表单 -->
@@ -574,6 +574,13 @@ async function handleRegister() {
  */
 function goLogin() {
   router.push('/login')
+}
+
+/**
+ * 返回首页
+ */
+function goHome() {
+  router.push('/home')
 }
 
 /**

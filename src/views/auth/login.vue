@@ -62,8 +62,13 @@
 
         <!-- 注册链接 -->
         <div class="login-footer">
-          <span>还没有账号？</span>
-          <a @click="goRegister">立即注册</a>
+          <div class="footer-link">
+            <span>还没有账号？</span>
+            <a @click="goRegister">立即注册</a>
+          </div>
+          <div class="footer-link">
+            <a @click="goHome" class="back-home">返回首页</a>
+          </div>
         </div>
       </div>
     </div>
@@ -173,6 +178,13 @@ function goRegister() {
 }
 
 /**
+ * 返回首页
+ */
+function goHome() {
+  router.push('/home')
+}
+
+/**
  * 组件卸载时清除定时器
  */
 import { onUnmounted } from 'vue'
@@ -224,18 +236,31 @@ onUnmounted(() => {
   }
 
   .login-footer {
-    text-align: center;
     margin-top: @padding-lg;
     font-size: @font-size-sm;
-    color: var(--text-color-2);
 
-    a {
-      color: var(--primary-color);
-      margin-left: 8px;
-      cursor: pointer;
+    .footer-link {
+      text-align: center;
+      margin-bottom: @padding-sm;
+      color: var(--text-color-2);
 
-      &:hover {
-        opacity: 0.8;
+      a {
+        color: @primary-color;
+        margin-left: 8px;
+        cursor: pointer;
+
+        &:hover {
+          opacity: 0.8;
+        }
+
+        &.back-home {
+          margin-left: 0;
+          color: var(--text-color-2);
+          
+          &:hover {
+            color: @primary-color;
+          }
+        }
       }
     }
   }
