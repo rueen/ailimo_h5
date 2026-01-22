@@ -30,6 +30,11 @@
             @click="router.push(service.path)"
           />
         </div>
+        <!-- 更多服务入口 -->
+        <div class="more-services" @click="router.push('/other-services')">
+          <span>更多服务</span>
+          <van-icon name="arrow" />
+        </div>
       </div>
 
       <!-- 视频展示 -->
@@ -237,6 +242,36 @@ function goServices() {
         align-items: center;
         justify-content: center;
         text-align: center;
+      }
+    }
+
+    .more-services {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      max-width: 1200px;
+      margin: 20px auto 0;
+      padding: @padding-md;
+      background-color: var(--bg-color-white);
+      border-radius: @border-radius-md;
+      cursor: pointer;
+      transition: all 0.3s;
+      color: @primary-color;
+      font-size: @font-size-md;
+      font-weight: 500;
+
+      &:hover {
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+        transform: translateY(-2px);
+      }
+
+      &:active {
+        transform: scale(0.98);
+      }
+
+      :deep(.van-icon) {
+        font-size: 16px;
       }
     }
   }
