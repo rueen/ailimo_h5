@@ -49,7 +49,7 @@
           />
           
           <!-- 时间选择 -->
-          <div v-if="formData.operation_content_id && formData.animal_type_id" class="time-picker-section">
+          <div class="time-picker-section">
             <date-time-slot-picker
               v-model="dateTimeValue"
               :advance-days="advanceDays"

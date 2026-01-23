@@ -449,6 +449,7 @@ onMounted(() => {
           border-color: var(--primary-color);
 
           .time-range,
+          .time-description,
           .remaining {
             color: #fff;
           }
@@ -461,6 +462,7 @@ onMounted(() => {
           opacity: 0.5;
 
           .time-range,
+          .time-description,
           .remaining {
             color: var(--text-color-4);
           }
