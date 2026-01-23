@@ -15,7 +15,22 @@
               </van-tag>
             </van-cell>
             <van-cell v-if="orderDetail.reject_reason" title="拒绝原因" :value="`#${orderDetail.reject_reason}`" />
-            <van-cell title="订单编号" :value="`#${orderDetail.order_sn}`" />
+            <van-cell title="订单编号">
+              <template #value>
+                <div class="order-sn-cell">
+                  <span>#{{ orderDetail.order_sn }}</span>
+                  <van-button
+                    size="mini"
+                    type="primary"
+                    plain
+                    icon="copy"
+                    @click.stop="copyOrderSn(orderDetail.order_sn)"
+                  >
+                    复制
+                  </van-button>
+                </div>
+              </template>
+            </van-cell>
             <van-cell title="创建时间" :value="orderDetail.created_at" />
             <van-cell v-if="orderDetail.audit_time" title="审核时间" :value="orderDetail.audit_time" />
             <van-cell v-if="orderDetail.completed_time" title="完成时间" :value="orderDetail.completed_time" />
@@ -174,10 +189,10 @@
 <script setup>
 import { ref, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
-import { showToast } from 'vant'
 import AppLayout from '@/components/layout/AppLayout.vue'
 import { getMyOrderDetail } from '@/api/order'
 import { formatTimeSlotsDisplay, getReservationPeriod } from '@/utils/timeSlot'
+import { copyToClipboard } from '@/utils/clipboard'
 
 const route = useRoute()
 const router = useRouter()
@@ -251,6 +266,17 @@ function formatEndDate(endDate) {
  */
 function getReservationPeriodText(startDate, endDate) {
   return getReservationPeriod(startDate, endDate)
+}
+
+/**
+ * 复制订单编号
+ * @param {string} orderSn - 订单编号
+ */
+async function copyOrderSn(orderSn) {
+  await copyToClipboard(orderSn, {
+    successMessage: '订单编号已复制',
+    errorMessage: '复制失败，请手动复制'
+  })
 }
 
 /**
@@ -348,6 +374,13 @@ onMounted(() => {
           line-height: 1.5;
           text-align: left;
         }
+      }
+
+      .order-sn-cell {
+        display: flex;
+        align-items: center;
+        justify-content: flex-end;
+        gap: 8px;
       }
     }
   }
