@@ -117,6 +117,7 @@
               <van-cell title="性别" :value="orderDetail.gender_text" />
               <van-cell title="环境" :value="orderDetail.environment?.name" />
               <van-cell title="要求" :value="orderDetail.requirement?.name" />
+              <van-cell title="是否打耳标" :value="getNeedEarTagText(orderDetail.need_ear_tag)" />
               <van-cell v-if="orderDetail.remark" title="备注" :label="orderDetail.remark" />
             </van-cell-group>
           </div>
@@ -266,6 +267,18 @@ function formatEndDate(endDate) {
  */
 function getReservationPeriodText(startDate, endDate) {
   return getReservationPeriod(startDate, endDate)
+}
+
+/**
+ * 获取是否打耳标文本
+ * @param {number|boolean} needEarTag - 是否打耳标：0/false-否，1/true-是
+ * @returns {string} 是否打耳标文本
+ */
+function getNeedEarTagText(needEarTag) {
+  if (needEarTag === 1 || needEarTag === true) {
+    return '是'
+  }
+  return '否'
 }
 
 /**

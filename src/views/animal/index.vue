@@ -66,6 +66,13 @@
             :rules="[{ required: true, message: '请选择要求' }]"
           />
           
+          <!-- 是否打耳标 -->
+          <van-cell title="是否打耳标">
+            <template #value>
+              <van-switch v-model="formData.need_ear_tag" />
+            </template>
+          </van-cell>
+          
           <!-- 导师姓名 -->
           <van-field
             v-model="formData.supervisor_name"
@@ -184,6 +191,7 @@ const formData = ref({
   address: '',
   environment_id: null,
   requirement_id: null,
+  need_ear_tag: false, // 是否打耳标，默认否
   remark: ''
 })
 
@@ -420,6 +428,7 @@ async function handleSubmit() {
       address: formData.value.address,
       environment_id: formData.value.environment_id,
       requirement_id: formData.value.requirement_id,
+      need_ear_tag: formData.value.need_ear_tag ? 1 : 0,
       remark: formData.value.remark
     }
     
