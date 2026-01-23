@@ -69,13 +69,13 @@ const routes = [
     meta: { title: '试剂耗材订购', requiresAuth: true, requiresAudit: true }
   },
   {
-    path: '/other-services',
+    path: '/services/other-services',
     name: 'OtherServices',
     component: () => import('@/views/other-services/index.vue'),
     meta: { title: '其他服务', requiresAuth: false }
   },
   {
-    path: '/other-services/:id',
+    path: '/services/other-services/:id',
     name: 'OtherServiceDetail',
     component: () => import('@/views/other-services/detail.vue'),
     meta: { title: '服务详情', requiresAuth: false }

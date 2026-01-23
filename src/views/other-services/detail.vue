@@ -31,7 +31,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, provide } from 'vue'
 import { useRoute } from 'vue-router'
 import { showToast } from 'vant'
 import AppLayout from '@/components/layout/AppLayout.vue'
@@ -44,6 +44,11 @@ const route = useRoute()
  */
 const detail = ref(null)
 const loading = ref(false)
+const navBarTitle = ref('其他服务详情')
+/**
+ * 提供导航栏标题给AppNavBar组件
+ */
+provide('navBarTitle', navBarTitle)
 
 /**
  * 获取详情
@@ -51,12 +56,14 @@ const loading = ref(false)
 async function fetchDetail() {
   try {
     loading.value = true
-    const res = await getOtherServiceDetail(route.params.id)
+    const data = await getOtherServiceDetail(route.params.id)
 
-    if (res.code === 200) {
-      detail.value = res.data
-    } else {
-      showToast(res.message || '获取详情失败')
+    detail.value = data;
+    // 更新导航栏标题为设备名称
+    if (detail.value?.title) {
+      navBarTitle.value = detail.value.title
+      // 同时更新页面标题
+      document.title = detail.value.title + ' - 其他服务详情'
     }
   } catch (error) {
     console.error('获取其他服务详情失败:', error)

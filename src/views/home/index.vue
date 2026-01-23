@@ -31,7 +31,7 @@
           />
         </div>
         <!-- 更多服务入口 -->
-        <div class="more-services" @click="router.push('/other-services')">
+        <div class="more-services" @click="router.push('/services/other-services')">
           <span>更多服务</span>
           <van-icon name="arrow" />
         </div>

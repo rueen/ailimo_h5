@@ -103,7 +103,7 @@ function formatTime(time) {
  * 跳转详情页
  */
 function goDetail(id) {
-  router.push(`/other-services/${id}`)
+  router.push(`/services/other-services/${id}`)
 }
 </script>
 
