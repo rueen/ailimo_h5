@@ -38,6 +38,7 @@
           @click="handleSlotClick(slot)"
         >
           <div class="time-range">{{ slot.display_time }}</div>
+          <div class="time-description">{{ slot.description }}</div>
           <div v-if="showRemaining" class="remaining">
             剩余 {{ slot.remaining || 0 }}
           </div>
@@ -430,6 +431,11 @@ onMounted(() => {
           font-size: @font-size-md;
           font-weight: 600;
           color: var(--text-color);
+          margin-bottom: 4px;
+        }
+        .time-description {
+          font-size: @font-size-xs;
+          color: var(--text-color-3);
           margin-bottom: 4px;
         }
 
