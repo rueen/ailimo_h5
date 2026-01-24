@@ -51,6 +51,17 @@ export const useUserStore = defineStore('user', () => {
   }
 
   /**
+   * 清空登录状态（不调用后端接口，用于 Token 失效等场景）
+   */
+  function clearAuth() {
+    token.value = null
+    userInfo.value = null
+    isLoggedIn.value = false
+    removeToken()
+    removeUser()
+  }
+
+  /**
    * 退出登录
    */
   async function logout() {
@@ -59,11 +70,7 @@ export const useUserStore = defineStore('user', () => {
     } catch (error) {
       console.error('退出登录失败:', error)
     } finally {
-      token.value = null
-      userInfo.value = null
-      isLoggedIn.value = false
-      removeToken()
-      removeUser()
+      clearAuth()
     }
   }
 
@@ -110,6 +117,7 @@ export const useUserStore = defineStore('user', () => {
     setAuth,
     getProfile,
     logout,
+    clearAuth,
     isAuditPassed,
     needAudit,
     isAuditRejected,

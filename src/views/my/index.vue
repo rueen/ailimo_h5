@@ -2,7 +2,7 @@
  * @Author: diaochan diaochan@seatent.com
  * @Date: 2026-01-17 19:16:48
  * @LastEditors: diaochan diaochan@seatent.com
- * @LastEditTime: 2026-01-21 19:50:11
+ * @LastEditTime: 2026-01-24 15:38:42
  * @FilePath: /ailimo_h5/src/views/my/index.vue
  * @Description: 这是默认设置,请设置`customMade`, 打开koroFileHeader查看配置 进行设置: https://github.com/OBKoro1/koro1FileHeader/wiki/%E9%85%8D%E7%BD%AE
 -->
@@ -33,6 +33,13 @@
         <van-cell v-if="userStore.userInfo?.address" title="详细地址" :label="userStore.userInfo.address" />
       </van-cell-group>
 
+      <div class="contact-tip">
+        如需修改账号信息，请联系客服
+        <template v-if="companyInfo?.contact_phone">
+          ，客服电话：<a :href="`tel:${companyInfo.contact_phone}`">{{ companyInfo.contact_phone }}</a>
+        </template>
+      </div>
+
       <van-cell-group style="margin-top: 16px;">
         <van-cell title="我的订单" is-link @click="router.push('/orders')" />
         <van-cell title="审核状态" is-link @click="router.push('/audit-status')" />
@@ -53,9 +60,16 @@ import { useRouter } from 'vue-router'
 import { showConfirmDialog } from 'vant'
 import AppLayout from '@/components/layout/AppLayout.vue'
 import { useUserStore } from '@/stores/user'
+import { useCompanyStore } from '@/stores/company'
 
 const router = useRouter()
 const userStore = useUserStore()
+const companyStore = useCompanyStore()
+
+/**
+ * 公司信息（客服电话来源）
+ */
+const companyInfo = computed(() => companyStore.companyInfo)
 
 /**
  * 用户状态文本
@@ -152,6 +166,19 @@ onMounted(async () => {
         font-size: @font-size-sm;
         color: var(--text-color-3);
       }
+    }
+  }
+
+  .contact-tip {
+    padding: @padding-md @padding-lg;
+    font-size: @font-size-sm;
+    color: var(--text-color-3);
+    background-color: var(--bg-color-white);
+    line-height: 1.5;
+
+    a {
+      color: @primary-color;
+      text-decoration: none;
     }
   }
 

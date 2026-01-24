@@ -3,9 +3,10 @@
  */
 
 import axios from 'axios'
-import { showToast, showDialog } from 'vant'
-import { getToken, clearStorage } from '@/utils/storage'
+import { showToast } from 'vant'
+import { getToken } from '@/utils/storage'
 import router from '@/router'
+import { useUserStore } from '@/stores/user'
 
 /**
  * 创建 Axios 实例
@@ -37,6 +38,21 @@ request.interceptors.request.use(
 )
 
 /**
+ * 处理 401：清空登录状态并跳转登录页
+ * @param {string} [msg] - 提示文案
+ */
+function handle401(msg) {
+  const userStore = useUserStore()
+  userStore.clearAuth()
+  showToast(msg || 'Token无效或已过期，请重新登录')
+  const redirect = router.currentRoute.value?.fullPath
+  router.replace({
+    path: '/login',
+    query: redirect && redirect !== '/login' ? { redirect } : {}
+  })
+}
+
+/**
  * 响应拦截器
  */
 request.interceptors.response.use(
@@ -48,10 +64,14 @@ request.interceptors.response.use(
       return data
     }
 
-    // 业务错误
-    showToast({
-      message: message || '请求失败',
-    })
+    // 业务 code 401：Token 无效或已过期
+    if (code === 401) {
+      handle401(message)
+      return Promise.reject(new Error(message || 'Token无效或已过期'))
+    }
+
+    // 其他业务错误
+    showToast(message || '请求失败')
     return Promise.reject(new Error(message || '请求失败'))
   },
   (error) => {
@@ -64,14 +84,7 @@ request.interceptors.response.use(
       switch (status) {
         case 401:
           // 未登录或 Token 失效
-          showDialog({
-            title: '提示',
-            message: '登录已过期，请重新登录',
-            confirmButtonText: '去登录'
-          }).then(() => {
-            clearStorage()
-            router.push('/login')
-          })
+          handle401(data?.message || '登录已过期，请重新登录')
           break
 
         case 403:

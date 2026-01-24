@@ -178,7 +178,12 @@
           </div>
         </template>
 
-        
+        <div class="contact-tip">
+          如需修改订单信息，请联系客服
+          <template v-if="companyInfo?.contact_phone">
+            ，客服电话：<a :href="`tel:${companyInfo.contact_phone}`">{{ companyInfo.contact_phone }}</a>
+          </template>
+        </div>
       </div>
 
       <!-- 空状态 -->
@@ -188,17 +193,24 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import AppLayout from '@/components/layout/AppLayout.vue'
 import { getMyOrderDetail } from '@/api/order'
 import { formatTimeSlotsDisplay, getReservationPeriod } from '@/utils/timeSlot'
 import { copyToClipboard } from '@/utils/clipboard'
+import { useCompanyStore } from '@/stores/company'
 
 const route = useRoute()
 const router = useRouter()
+const companyStore = useCompanyStore()
 const loading = ref(false)
 const orderDetail = ref(null)
+
+/**
+ * 公司信息（客服电话来源）
+ */
+const companyInfo = computed(() => companyStore.companyInfo)
 
 /**
  * 性别映射
@@ -394,6 +406,21 @@ onMounted(() => {
         align-items: center;
         justify-content: flex-end;
         gap: 8px;
+      }
+    }
+
+    .contact-tip {
+      padding: @padding-md @padding-lg;
+      font-size: @font-size-sm;
+      color: var(--text-color-3);
+      background-color: var(--bg-color-white);
+      border-radius: @border-radius-md;
+      margin-top: @padding-md;
+      line-height: 1.5;
+
+      a {
+        color: @primary-color;
+        text-decoration: none;
       }
     }
   }
