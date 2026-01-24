@@ -440,7 +440,8 @@ async function handleRegister() {
     const data = {
       name: formData.value.name,
       phone: formData.value.phone,
-      code: formData.value.code
+      code: formData.value.code,
+      audit_status: 1
     }
 
     // 处理组织机构
