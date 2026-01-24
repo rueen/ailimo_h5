@@ -33,36 +33,20 @@
 </template>
 
 <script setup>
-import { ref, onMounted, provide, watch } from 'vue'
+import { ref, onMounted, provide } from 'vue'
 import { useRoute } from 'vue-router'
 import { showImagePreview } from 'vant'
 import AppLayout from '@/components/layout/AppLayout.vue'
 import { getCaseDetail } from '@/api/case'
-import { updateWechatShare, isWechat } from '@/utils/wechat'
 
 const route = useRoute()
 const loading = ref(false)
 const caseDetail = ref(null)
 const navBarTitle = ref('案例详情')
-
 /**
  * 提供导航栏标题给AppNavBar组件
  */
 provide('navBarTitle', navBarTitle)
-
-/**
- * 监听案例详情变化，更新分享内容
- */
-watch(caseDetail, (detail) => {
-  if (detail && isWechat()) {
-    updateWechatShare({
-      title: detail.project_name,
-      desc: detail.project_summary,
-      imgUrl: detail.images?.[0] || 'https://www.ailimolab.com/share-cover.png',
-      link: location.href
-    })
-  }
-})
 
 async function loadCaseDetail() {
   try {

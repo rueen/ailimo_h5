@@ -193,14 +193,13 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted, watch } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import AppLayout from '@/components/layout/AppLayout.vue'
 import { getMyOrderDetail } from '@/api/order'
 import { formatTimeSlotsDisplay, getReservationPeriod } from '@/utils/timeSlot'
 import { copyToClipboard } from '@/utils/clipboard'
 import { useCompanyStore } from '@/stores/company'
-import { updateWechatShare, isWechat } from '@/utils/wechat'
 
 const route = useRoute()
 const router = useRouter()
@@ -212,20 +211,6 @@ const orderDetail = ref(null)
  * 公司信息（客服电话来源）
  */
 const companyInfo = computed(() => companyStore.companyInfo)
-
-/**
- * 监听订单详情变化，更新分享内容
- */
-watch(orderDetail, (detail) => {
-  if (detail && isWechat()) {
-    updateWechatShare({
-      title: `${detail.type_name} - 订单详情`,
-      desc: `订单编号：${detail.order_sn}`,
-      imgUrl: 'https://www.ailimolab.com/share-cover.png',
-      link: location.href
-    })
-  }
-})
 
 /**
  * 性别映射
