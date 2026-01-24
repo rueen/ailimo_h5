@@ -178,8 +178,8 @@ async function handleLogout() {
     cursor: pointer;
 
     img {
-      width: 32px;
-      height: 32px;
+      width: 52px;
+      height: 52px;
     }
 
     span {
