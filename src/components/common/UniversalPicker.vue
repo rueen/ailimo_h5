@@ -13,8 +13,28 @@
     />
     
     <van-popup v-model:show="showPicker" position="bottom" round>
+      <!-- 搜索框 -->
+      <div v-if="enableSearch && columns.length > searchThreshold" class="picker-search">
+        <van-search
+          v-model="searchKeyword"
+          placeholder="搜索选项"
+          :clearable="true"
+          show-action
+          @search="onSearch"
+          @cancel="onSearchCancel"
+          @clear="onSearchClear"
+        />
+      </div>
+      
+      <!-- 提示信息 -->
+      <div v-if="enableSearch && searchKeyword && filteredColumns.length === 0" class="picker-empty">
+        <van-empty description="未找到匹配的选项" />
+      </div>
+      
+      <!-- 选择器 -->
       <van-picker
-        :columns="columns"
+        v-else
+        :columns="filteredColumns"
         :loading="loading"
         @confirm="handleMobileConfirm"
         @cancel="showPicker = false"
@@ -24,7 +44,7 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted, onUnmounted } from 'vue'
+import { ref, computed, watch } from 'vue'
 import { showToast } from 'vant'
 
 /**
@@ -78,6 +98,16 @@ const props = defineProps({
   rules: {
     type: Array,
     default: () => []
+  },
+  /** 是否启用搜索功能 */
+  enableSearch: {
+    type: Boolean,
+    default: true
+  },
+  /** 选项数量超过此阈值时显示搜索框 */
+  searchThreshold: {
+    type: Number,
+    default: 10
   }
 })
 
@@ -92,6 +122,11 @@ const emit = defineEmits(['update:modelValue', 'change', 'confirm'])
 const showPicker = ref(false)
 
 /**
+ * 搜索关键词
+ */
+const searchKeyword = ref('')
+
+/**
  * 显示的文本（移动端）
  */
 const displayText = computed(() => {
@@ -99,6 +134,24 @@ const displayText = computed(() => {
   
   const selected = props.columns.find(item => item.value === props.modelValue)
   return selected ? selected.text : ''
+})
+
+/**
+ * 过滤后的选项列表
+ */
+const filteredColumns = computed(() => {
+  if (!props.enableSearch || !searchKeyword.value.trim()) {
+    return props.columns
+  }
+  
+  const keyword = searchKeyword.value.toLowerCase().trim()
+  return props.columns.filter(item => {
+    const text = String(item.text).toLowerCase()
+    // 支持全文搜索和拼音首字母搜索（如果有 pinyin 字段）
+    const matchText = text.includes(keyword)
+    const matchPinyin = item.pinyin && String(item.pinyin).toLowerCase().includes(keyword)
+    return matchText || matchPinyin
+  })
 })
 
 /**
@@ -132,22 +185,56 @@ function handleMobileConfirm({ selectedOptions }) {
 }
 
 /**
- * 组件挂载时添加监听
+ * 搜索事件
  */
-onMounted(() => {
-  
-})
+function onSearch() {
+  // 搜索时自动过滤，无需额外处理
+}
 
 /**
- * 组件卸载时移除监听
+ * 取消搜索
  */
-onUnmounted(() => {
+function onSearchCancel() {
+  searchKeyword.value = ''
+}
 
+/**
+ * 清空搜索
+ */
+function onSearchClear() {
+  searchKeyword.value = ''
+}
+
+/**
+ * 监听选择器显示状态，关闭时清空搜索
+ */
+watch(showPicker, (newVal) => {
+  if (!newVal) {
+    searchKeyword.value = ''
+  }
 })
 </script>
 
 <style lang="less" scoped>
 .universal-picker {
   width: 100%;
+}
+
+.picker-search {
+  padding: 12px 16px 0;
+  background-color: var(--van-background-2);
+  
+  :deep(.van-search) {
+    padding: 0;
+    
+    .van-search__content {
+      border-radius: 20px;
+    }
+  }
+}
+
+.picker-empty {
+  padding: 60px 0;
+  text-align: center;
 }
 </style>
