@@ -1,10 +1,17 @@
+/*
+ * @Author: diaochan diaochan@seatent.com
+ * @Date: 2026-01-17 19:11:20
+ * @LastEditors: diaochan diaochan@seatent.com
+ * @LastEditTime: 2026-01-25 10:54:35
+ * @FilePath: /ailimo_h5/src/main.js
+ * @Description: 这是默认设置,请设置`customMade`, 打开koroFileHeader查看配置 进行设置: https://github.com/OBKoro1/koro1FileHeader/wiki/%E9%85%8D%E7%BD%AE
+ */
 import { createApp } from 'vue'
 import { createPinia } from 'pinia'
 import App from './App.vue'
 import router from './router'
 
-// 导入Vant样式
-// import 'vant/lib/index.css'
+import '@vant/touch-emulator';
 
 // 引入全局样式
 import './styles/index.less'

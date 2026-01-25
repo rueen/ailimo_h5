@@ -1,90 +1,26 @@
 <template>
   <div class="region-picker">
-    <!-- PC 端使用三个级联的 select -->
-    <template v-if="isPC">
-      <div class="pc-region-wrapper">
-        <label class="pc-label required">收货地址</label>
-        <div class="pc-select-group">
-          <!-- 省份 -->
-          <select
-            v-model="selectedProvince"
-            class="pc-select"
-            :class="{ 'is-placeholder': !selectedProvince }"
-            @change="onProvinceChange"
-          >
-            <option value="">请选择省份</option>
-            <option
-              v-for="item in provinces"
-              :key="item.value"
-              :value="item.value"
-            >
-              {{ item.text }}
-            </option>
-          </select>
-          
-          <!-- 城市 -->
-          <select
-            v-model="selectedCity"
-            class="pc-select"
-            :class="{ 'is-placeholder': !selectedCity }"
-            :disabled="!selectedProvince"
-            @change="onCityChange"
-          >
-            <option value="">请选择城市</option>
-            <option
-              v-for="item in cities"
-              :key="item.value"
-              :value="item.value"
-            >
-              {{ item.text }}
-            </option>
-          </select>
-          
-          <!-- 区县 -->
-          <select
-            v-model="selectedDistrict"
-            class="pc-select"
-            :class="{ 'is-placeholder': !selectedDistrict }"
-            :disabled="!selectedCity"
-            @change="onDistrictChange"
-          >
-            <option value="">请选择区县</option>
-            <option
-              v-for="item in districts"
-              :key="item.value"
-              :value="item.value"
-            >
-              {{ item.text }}
-            </option>
-          </select>
-        </div>
-      </div>
-    </template>
+    <van-field
+      :model-value="regionText"
+      label="收货地址"
+      placeholder="请选择省市区"
+      readonly
+      is-link
+      required
+      :rules="[{ required: true, message: '请选择收货地址' }]"
+      @click="showPicker = true"
+    />
     
-    <!-- 移动端使用 van-picker -->
-    <template v-else>
-      <van-field
-        :model-value="regionText"
-        label="收货地址"
-        placeholder="请选择省市区"
-        readonly
-        is-link
-        required
-        :rules="[{ required: true, message: '请选择收货地址' }]"
-        @click="showPicker = true"
+    <van-popup v-model:show="showPicker" position="bottom" round>
+      <van-picker
+        ref="pickerRef"
+        :columns="columns"
+        :loading="loading"
+        @confirm="onConfirm"
+        @cancel="showPicker = false"
+        @change="onChange"
       />
-      
-      <van-popup v-model:show="showPicker" position="bottom" round>
-        <van-picker
-          ref="pickerRef"
-          :columns="columns"
-          :loading="loading"
-          @confirm="onConfirm"
-          @cancel="showPicker = false"
-          @change="onChange"
-        />
-      </van-popup>
-    </template>
+    </van-popup>
   </div>
 </template>
 
@@ -92,7 +28,6 @@
 import { ref, computed, watch, onMounted, onUnmounted } from 'vue'
 import { showToast } from 'vant'
 import { getRegions } from '@/api/common'
-import { isPC as detectIsPC } from '@/utils/device'
 
 /**
  * 组件 Props
@@ -115,21 +50,9 @@ const props = defineProps({
 const emit = defineEmits(['update:modelValue'])
 
 /**
- * 是否为 PC 端
- */
-const isPC = ref(detectIsPC())
-
-/**
  * 显示选择器（移动端）
  */
 const showPicker = ref(false)
-
-/**
- * PC 端选中的值
- */
-const selectedProvince = ref('')
-const selectedCity = ref('')
-const selectedDistrict = ref('')
 
 /**
  * 加载状态
@@ -301,78 +224,6 @@ function onConfirm({ selectedOptions }) {
 }
 
 /**
- * PC 端省份改变
- */
-async function onProvinceChange() {
-  // 清空城市和区县
-  selectedCity.value = ''
-  selectedDistrict.value = ''
-  cities.value = []
-  districts.value = []
-  
-  if (selectedProvince.value) {
-    await loadCities(selectedProvince.value)
-  }
-  
-  updateValue()
-}
-
-/**
- * PC 端城市改变
- */
-async function onCityChange() {
-  // 清空区县
-  selectedDistrict.value = ''
-  districts.value = []
-  
-  if (selectedCity.value) {
-    await loadDistricts(selectedCity.value)
-  }
-  
-  updateValue()
-}
-
-/**
- * PC 端区县改变
- */
-function onDistrictChange() {
-  updateValue()
-}
-
-/**
- * 更新 v-model 值
- */
-function updateValue() {
-  if (selectedProvince.value && selectedCity.value && selectedDistrict.value) {
-    // 获取选中的名称
-    const province = provinces.value.find(item => item.value == selectedProvince.value)
-    const city = cities.value.find(item => item.value == selectedCity.value)
-    const district = districts.value.find(item => item.value == selectedDistrict.value)
-    
-    if (province && city && district) {
-      selectedNames.value = {
-        province: province.text,
-        city: city.text,
-        district: district.text
-      }
-      
-      emit('update:modelValue', {
-        province_id: selectedProvince.value,
-        city_id: selectedCity.value,
-        district_id: selectedDistrict.value
-      })
-    }
-  }
-}
-
-/**
- * 窗口大小改变处理
- */
-const handleResize = () => {
-  isPC.value = detectIsPC()
-}
-
-/**
  * 监听显示状态，打开时加载数据（移动端）
  */
 watch(showPicker, (newVal) => {
@@ -385,96 +236,19 @@ watch(showPicker, (newVal) => {
  * 组件挂载时初始化
  */
 onMounted(() => {
-  // PC 端自动加载省份数据
-  if (isPC.value) {
-    loadProvinces()
-  }
   
-  // 添加窗口大小监听
-  if (typeof window !== 'undefined') {
-    window.addEventListener('resize', handleResize)
-  }
 })
 
 /**
  * 组件卸载时清理
  */
 onUnmounted(() => {
-  if (typeof window !== 'undefined') {
-    window.removeEventListener('resize', handleResize)
-  }
+
 })
 </script>
 
 <style lang="less" scoped>
 .region-picker {
   width: 100%;
-  
-  // PC 端样式
-  .pc-region-wrapper {
-    display: flex;
-    align-items: center;
-    padding: 10px 16px;
-    background-color: #fff;
-    
-    .pc-label {
-      flex: none;
-      box-sizing: border-box;
-      width: var(--van-field-label-width);
-      margin-right: var(--van-field-label-margin-right);
-      color: var(--van-field-label-color);
-      text-align: left;
-      word-wrap: break-word;
-      
-      &.required::before {
-        content: '*';
-        color: #ee0a24;
-        margin-right: 4px;
-      }
-    }
-    
-    .pc-select-group {
-      flex: 1;
-      display: flex;
-      gap: 12px;
-      
-      .pc-select {
-        flex: 1;
-        height: 36px;
-        padding: 0 12px;
-        border: 1px solid #ebedf0;
-        border-radius: 4px;
-        font-size: 14px;
-        color: #323233;
-        background-color: #fff;
-        cursor: pointer;
-        transition: all 0.3s;
-        
-        &:hover:not(:disabled) {
-          border-color: #1989fa;
-        }
-        
-        &:focus {
-          outline: none;
-          border-color: #1989fa;
-          box-shadow: 0 0 0 2px rgba(25, 137, 250, 0.1);
-        }
-        
-        &:disabled {
-          background-color: #f7f8fa;
-          color: #c8c9cc;
-          cursor: not-allowed;
-        }
-        
-        &.is-placeholder {
-          color: #c8c9cc;
-        }
-        
-        option {
-          padding: 8px 0;
-        }
-      }
-    }
-  }
 }
 </style>

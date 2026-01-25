@@ -1,56 +1,32 @@
 <template>
   <div class="universal-date-picker">
-    <!-- PC 端使用原生 input type="date" -->
-    <template v-if="isPC">
-      <div class="pc-date-wrapper">
-        <label v-if="label" class="pc-label" :class="{ required: required }">
-          {{ label }}
-        </label>
-        <input
-          type="date"
-          :value="modelValue"
-          :disabled="disabled"
-          :required="required"
-          :min="minDateString"
-          :max="maxDateString"
-          class="pc-date-input"
-          :class="{ 'is-placeholder': !modelValue }"
-          @change="handlePCChange"
-        />
-      </div>
-    </template>
+    <van-field
+      :model-value="modelValue"
+      :label="label"
+      :placeholder="placeholder"
+      :disabled="disabled"
+      :required="required"
+      :rules="rules"
+      readonly
+      is-link
+      @click="handleMobileClick"
+    />
     
-    <!-- 移动端使用 van-date-picker -->
-    <template v-else>
-      <van-field
-        :model-value="modelValue"
-        :label="label"
-        :placeholder="placeholder"
-        :disabled="disabled"
-        :required="required"
-        :rules="rules"
-        readonly
-        is-link
-        @click="handleMobileClick"
+    <van-popup v-model:show="showPicker" position="bottom" round>
+      <van-date-picker
+        v-model="currentDate"
+        :title="title"
+        :min-date="minDate"
+        :max-date="maxDate"
+        @confirm="handleMobileConfirm"
+        @cancel="showPicker = false"
       />
-      
-      <van-popup v-model:show="showPicker" position="bottom" round>
-        <van-date-picker
-          v-model="currentDate"
-          :title="title"
-          :min-date="minDate"
-          :max-date="maxDate"
-          @confirm="handleMobileConfirm"
-          @cancel="showPicker = false"
-        />
-      </van-popup>
-    </template>
+    </van-popup>
   </div>
 </template>
 
 <script setup>
-import { ref, computed, watch, onMounted, onUnmounted } from 'vue'
-import { isPC as detectIsPC } from '@/utils/device'
+import { ref, onMounted, onUnmounted } from 'vue'
 
 /**
  * 组件 Props
@@ -109,11 +85,6 @@ const props = defineProps({
 const emit = defineEmits(['update:modelValue', 'change', 'confirm'])
 
 /**
- * 是否为 PC 端
- */
-const isPC = ref(detectIsPC())
-
-/**
  * 移动端显示选择器
  */
 const showPicker = ref(false)
@@ -122,35 +93,6 @@ const showPicker = ref(false)
  * 当前日期（移动端使用，数组格式）
  */
 const currentDate = ref([])
-
-/**
- * PC 端最小日期字符串
- */
-const minDateString = computed(() => {
-  return formatDateToString(props.minDate)
-})
-
-/**
- * PC 端最大日期字符串
- */
-const maxDateString = computed(() => {
-  return formatDateToString(props.maxDate)
-})
-
-/**
- * 将 Date 对象转换为 YYYY-MM-DD 字符串
- * @param {Date} date - 日期对象
- * @returns {string} 日期字符串
- */
-function formatDateToString(date) {
-  if (!date) return ''
-  
-  const year = date.getFullYear()
-  const month = String(date.getMonth() + 1).padStart(2, '0')
-  const day = String(date.getDate()).padStart(2, '0')
-  
-  return `${year}-${month}-${day}`
-}
 
 /**
  * 将日期字符串转换为数组格式 [year, month, day]
@@ -165,18 +107,6 @@ function parseDateString(dateString) {
   
   const [year, month, day] = dateString.split('-').map(Number)
   return [year, month, day]
-}
-
-/**
- * PC 端日期改变
- * @param {Event} event - 原生 change 事件
- */
-function handlePCChange(event) {
-  const value = event.target.value
-  
-  emit('update:modelValue', value)
-  emit('change', { value })
-  emit('confirm', { value })
 }
 
 /**
@@ -216,98 +146,22 @@ function handleMobileConfirm({ selectedValues }) {
 }
 
 /**
- * 窗口大小改变处理
- */
-const handleResize = () => {
-  isPC.value = detectIsPC()
-}
-
-/**
  * 组件挂载时添加监听
  */
 onMounted(() => {
-  console.log('UniversalDatePicker: 组件挂载，当前设备类型:', isPC.value ? 'PC' : '移动端')
   
-  if (typeof window !== 'undefined') {
-    window.addEventListener('resize', handleResize)
-  }
 })
 
 /**
  * 组件卸载时移除监听
  */
 onUnmounted(() => {
-  if (typeof window !== 'undefined') {
-    window.removeEventListener('resize', handleResize)
-  }
+
 })
 </script>
 
 <style lang="less" scoped>
 .universal-date-picker {
   width: 100%;
-  
-  // PC 端样式
-  .pc-date-wrapper {
-    display: flex;
-    align-items: center;
-    padding: 10px 16px;
-    background-color: #fff;
-    
-    .pc-label {
-      flex: none;
-      box-sizing: border-box;
-      width: var(--van-field-label-width);
-      margin-right: var(--van-field-label-margin-right);
-      color: var(--van-field-label-color);
-      text-align: left;
-      word-wrap: break-word;
-      
-      &.required::before {
-        content: '*';
-        color: #ee0a24;
-        margin-right: 4px;
-      }
-    }
-    
-    .pc-date-input {
-      flex: 1;
-      height: 36px;
-      padding: 0 12px;
-      border: 1px solid #ebedf0;
-      border-radius: 4px;
-      font-size: 14px;
-      color: #323233;
-      background-color: #fff;
-      cursor: pointer;
-      transition: all 0.3s;
-      
-      &:hover:not(:disabled) {
-        border-color: #1989fa;
-      }
-      
-      &:focus {
-        outline: none;
-        border-color: #1989fa;
-        box-shadow: 0 0 0 2px rgba(25, 137, 250, 0.1);
-      }
-      
-      &:disabled {
-        background-color: #f7f8fa;
-        color: #c8c9cc;
-        cursor: not-allowed;
-      }
-      
-      // 修改日历图标颜色
-      &::-webkit-calendar-picker-indicator {
-        cursor: pointer;
-        filter: opacity(0.6);
-        
-        &:hover {
-          filter: opacity(1);
-        }
-      }
-    }
-  }
 }
 </style>
