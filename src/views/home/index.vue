@@ -32,7 +32,7 @@
         </div>
         <!-- 更多服务入口 -->
         <div class="more-services" @click="router.push('/services/other-services')">
-          <span>更多服务</span>
+          <span>其他技术支持服务</span>
           <van-icon name="arrow" />
         </div>
       </div>
@@ -94,34 +94,34 @@ const bannerImages = computed(() => {
 /**
  * 服务列表
  */
-const serviceList = [
+ const serviceList = [
   {
     title: '设备预约',
-    description: '专业仪器设备预约服务，满足您的科研需求',
+    description: '设备分类、设备名称、预约时间、使用用途',
     icon: 'https://ailimolab.oss-cn-hangzhou.aliyuncs.com/images/h5/device.png',
     path: '/services/equipment'
   },
   {
     title: '笼位预约',
-    description: '大小鼠饲养笼位预约',
+    description: '数量、预约时间、用途（短期实验、长期繁殖）',
     icon: 'https://ailimolab.oss-cn-hangzhou.aliyuncs.com/images/h5/cage.png',
     path: '/services/cage'
   },
   {
     title: '实验代操作',
-    description: '常见动物实验代操作',
+    description: '动物类型、数量、操作内容、预约时间',
     icon: 'https://ailimolab.oss-cn-hangzhou.aliyuncs.com/images/h5/operation.png',
     path: '/services/experiment'
   },
   {
     title: '动物订购',
-    description: '提供各大品牌优选实验动物',
+    description: '品牌要求、种类/品系、规格、性别、到货日期等',
     icon: 'https://ailimolab.oss-cn-hangzhou.aliyuncs.com/images/h5/animal.png',
     path: '/services/animal'
   },
   {
     title: '试剂耗材订购',
-    description: '可提供各类试剂耗材代购服务',
+    description: '品牌要求、种类/品系、规格、性别、到货日期等',
     icon: 'https://ailimolab.oss-cn-hangzhou.aliyuncs.com/images/h5/reagent.png',
     path: '/services/reagent'
   }
