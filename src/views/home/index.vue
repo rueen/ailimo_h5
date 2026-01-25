@@ -109,7 +109,7 @@ const serviceList = [
   },
   {
     title: '实验代操作',
-    description: '动物实验、称重、灌胃、操作代等，可提供时付费',
+    description: '动物实验、称重、灌胃、代操作等，可提供时付费',
     icon: 'https://ailimolab.oss-cn-hangzhou.aliyuncs.com/images/h5/operation.png',
     path: '/services/experiment'
   },

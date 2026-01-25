@@ -1,10 +1,10 @@
 <template>
-  <div class="app-layout" :class="{ 'has-tabbar': showTabbar, 'is-pc': isPc }">
+  <div class="app-layout" :class="layoutClass">
     <!-- PC 端头部 -->
     <app-header v-if="showHeader && isPc" />
 
-    <!-- 移动端导航栏 -->
-    <app-nav-bar v-if="!isPc && showNavBar" :show-nav-bar="showNavBar" />
+    <!-- 移动端导航栏（微信浏览器有自带导航栏，不重复展示） -->
+    <app-nav-bar v-if="showNavBarInMobile" :show-nav-bar="showNavBar" />
 
     <!-- 主内容区 -->
     <div class="app-main">
@@ -26,6 +26,7 @@ import AppHeader from './AppHeader.vue'
 import AppNavBar from './AppNavBar.vue'
 import AppTabbar from './AppTabbar.vue'
 import AppFooter from './AppFooter.vue'
+import { isWechat } from '@/utils/device'
 
 const route = useRoute()
 
@@ -46,16 +47,29 @@ const props = defineProps({
 /**
  * 是否显示底部导航
  */
-const showTabbar = computed(() => {
-  return route.meta.showTabbar
-})
+const showTabbar = computed(() => route.meta.showTabbar)
 
 /**
  * 是否为 PC 端
  */
-const isPc = computed(() => {
-  return window.innerWidth >= 768
+const isPc = computed(() => window.innerWidth >= 768)
+
+/**
+ * 移动端是否展示自定义导航栏
+ * 微信浏览器有自带导航栏（标题、返回等），不重复展示
+ */
+const showNavBarInMobile = computed(() => {
+  return !isPc.value && props.showNavBar && !isWechat()
 })
+
+/**
+ * 布局 class
+ */
+const layoutClass = computed(() => ({
+  'has-tabbar': showTabbar.value,
+  'is-pc': isPc.value,
+  'wechat-no-nav': !isPc.value && isWechat()
+}))
 </script>
 
 <style lang="less" scoped>
@@ -75,6 +89,12 @@ const isPc = computed(() => {
     .app-main {
       padding-bottom: 50px;
     }
+  }
+
+  // 微信内隐藏自定义导航栏时，顶部留出安全区域（可选，避免内容贴顶）
+  &.wechat-no-nav .app-main {
+    padding-top: constant(safe-area-inset-top);
+    padding-top: env(safe-area-inset-top);
   }
 }
 </style>

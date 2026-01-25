@@ -48,3 +48,12 @@ export function isPC() {
 export function getDeviceType() {
   return isMobile() ? 'mobile' : 'pc'
 }
+
+/**
+ * 检测是否在微信内置浏览器中
+ * @returns {boolean}
+ */
+export function isWechat() {
+  const ua = navigator.userAgent.toLowerCase()
+  return /micromessenger/.test(ua)
+}
