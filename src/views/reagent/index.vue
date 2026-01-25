@@ -118,7 +118,7 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted } from 'vue'
+import { ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { showToast, showSuccessToast, showDialog } from 'vant'
 import AppLayout from '@/components/layout/AppLayout.vue'
@@ -131,16 +131,9 @@ import {
   getReagentSpecifications
 } from '@/api/common'
 import PageTitle from '@/components/common/PageTitle.vue'
-import { useCompanyStore } from '@/stores/company'
 
 const router = useRouter()
 const formRef = ref(null)
-const companyStore = useCompanyStore()
-
-/**
- * 公司信息
- */
-const companyInfo = computed(() => companyStore.companyInfo)
 
 /**
  * 表单数据
@@ -153,7 +146,7 @@ const formData = ref({
   orderer_name: '',
   contact_phone: '',
   delivery_date: '',
-  address: '',
+  address: '西园五路6号奥强大厦2号楼19楼',
   remark: ''
 })
 
@@ -161,9 +154,9 @@ const formData = ref({
  * 地区选择值
  */
 const regionValue = ref({
-  province_id: null,
-  city_id: null,
-  district_id: null
+  province_id: 330000,
+  city_id: 330100,
+  district_id: 330106
 })
 
 /**
@@ -220,18 +213,6 @@ const phoneRules = [
  * 初始化数据
  */
 onMounted(async () => {
-  // 填充默认地址（公司地址）
-  if (companyInfo.value?.company_address) {
-    formData.value.address = companyInfo.value.company_address
-  }
-  
-  // 填充默认省市区（浙江省 杭州市 西湖区）
-  regionValue.value = {
-    province_id: 330000,
-    city_id: 330100,
-    district_id: 330106
-  }
-  
   await Promise.all([
     loadBrands(),
     loadSpecifications()
