@@ -43,7 +43,7 @@
             <div class="section-title">设备信息</div>
             <van-cell-group>
               <van-cell title="设备名称" :value="orderDetail.equipment?.name" is-link @click="router.push(`/equipment/${orderDetail.equipment_id}`)" />
-              <van-cell v-if="orderDetail.remark" title="备注" :label="orderDetail.remark" />
+              <van-cell v-if="orderDetail.remark" title="备注" :value="orderDetail.remark" />
             </van-cell-group>
           </div>
 
@@ -64,7 +64,7 @@
               <van-cell title="环境类型" :value="orderDetail.environment?.name" />
               <van-cell title="笼位数量" :value="`${orderDetail.quantity} 个`" />
               <van-cell title="用途" :value="orderDetail.purpose?.name" />
-              <van-cell v-if="orderDetail.remark" title="备注" :label="orderDetail.remark" />
+              <van-cell v-if="orderDetail.remark" title="备注" :value="orderDetail.remark" />
             </van-cell-group>
           </div>
 
@@ -94,7 +94,7 @@
               <van-cell title="操作内容" :value="orderDetail.operation_content?.name" />
               <van-cell title="动物类型" :value="orderDetail.animal_type?.name" />
               <van-cell title="动物数量" :value="`${orderDetail.quantity} 只`" />
-              <van-cell v-if="orderDetail.remark" title="备注" :label="orderDetail.remark" />
+              <van-cell v-if="orderDetail.remark" title="备注" :value="orderDetail.remark" />
             </van-cell-group>
           </div>
 
@@ -118,7 +118,7 @@
               <van-cell title="环境" :value="orderDetail.environment?.name" />
               <van-cell title="要求" :value="orderDetail.requirement?.name" />
               <van-cell title="是否打耳标" :value="getNeedEarTagText(orderDetail.need_ear_tag)" />
-              <van-cell v-if="orderDetail.remark" title="备注" :label="orderDetail.remark" />
+              <van-cell v-if="orderDetail.remark" title="备注" :value="orderDetail.remark" />
             </van-cell-group>
           </div>
 
@@ -150,10 +150,10 @@
             <div class="section-title">试剂耗材信息</div>
             <van-cell-group>
               <van-cell title="名称" :value="orderDetail.name" />
-              <van-cell title="品牌" :value="orderDetail.brand?.name" />
-              <van-cell title="规格" :value="orderDetail.specification?.name" />
+              <van-cell title="品牌" :value="orderDetail.brand_name" />
+              <van-cell title="规格" :value="orderDetail.specification_name" />
               <van-cell title="数量" :value="`${orderDetail.quantity} 件`" />
-              <van-cell v-if="orderDetail.remark" title="备注" :label="orderDetail.remark" />
+              <van-cell v-if="orderDetail.remark" title="备注" :value="orderDetail.remark" />
             </van-cell-group>
           </div>
 
@@ -173,7 +173,7 @@
                 title="收货地址" 
                 :value="getRegionText(orderDetail)" 
               />
-              <van-cell title="详细地址" :label="orderDetail.address" />
+              <van-cell title="详细地址" :value="orderDetail.address" />
             </van-cell-group>
           </div>
         </template>

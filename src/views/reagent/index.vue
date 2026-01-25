@@ -15,23 +15,21 @@
           />
           
           <!-- 品牌 -->
-          <universal-picker
-            v-model="formData.brand_id"
-            :columns="brandOptions"
+          <van-field
+            v-model="formData.brand_name"
             label="品牌"
-            placeholder="请选择品牌"
+            placeholder="请输入品牌名称"
             required
-            :rules="[{ required: true, message: '请选择品牌' }]"
+            :rules="[{ required: true, message: '请输入品牌名称' }]"
           />
           
           <!-- 规格 -->
-          <universal-picker
-            v-model="formData.specification_id"
-            :columns="specificationOptions"
+          <van-field
+            v-model="formData.specification_name"
             label="规格"
-            placeholder="请选择规格"
+            placeholder="请输入规格名称"
             required
-            :rules="[{ required: true, message: '请选择规格' }]"
+            :rules="[{ required: true, message: '请输入规格名称' }]"
           />
           
           <!-- 数量 -->
@@ -140,8 +138,8 @@ const formRef = ref(null)
  */
 const formData = ref({
   name: '',
-  brand_id: null,
-  specification_id: null,
+  brand_name: '',
+  specification_name: '',
   quantity: '',
   orderer_name: '',
   contact_phone: '',
@@ -158,11 +156,6 @@ const regionValue = ref({
   city_id: 330100,
   district_id: 330106
 })
-
-/**
- * 品牌选项
- */
-const brandOptions = ref([])
 
 /**
  * 规格选项
@@ -213,43 +206,8 @@ const phoneRules = [
  * 初始化数据
  */
 onMounted(async () => {
-  await Promise.all([
-    loadBrands(),
-    loadSpecifications()
-  ])
+
 })
-
-/**
- * 加载品牌列表
- */
-async function loadBrands() {
-  try {
-    const data = await getReagentBrands()
-    brandOptions.value = (data || []).map(item => ({
-      text: item.name,
-      value: item.id
-    }))
-  } catch (error) {
-    console.error('加载品牌列表失败:', error)
-    showToast('加载品牌列表失败')
-  }
-}
-
-/**
- * 加载规格列表
- */
-async function loadSpecifications() {
-  try {
-    const data = await getReagentSpecifications()
-    specificationOptions.value = (data || []).map(item => ({
-      text: item.name,
-      value: item.id
-    }))
-  } catch (error) {
-    console.error('加载规格列表失败:', error)
-    showToast('加载规格列表失败')
-  }
-}
 
 /**
  * 提交表单
@@ -278,8 +236,8 @@ async function handleSubmit() {
     // 组装提交数据
     const submitData = {
       name: formData.value.name,
-      brand_id: formData.value.brand_id,
-      specification_id: formData.value.specification_id,
+      brand_name: formData.value.brand_name,
+      specification_name: formData.value.specification_name,
       quantity: Number(formData.value.quantity),
       orderer_name: formData.value.orderer_name,
       contact_phone: formData.value.contact_phone,
