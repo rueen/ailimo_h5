@@ -2,8 +2,8 @@
   <div class="region-picker">
     <van-field
       :model-value="regionText"
-      label="收货地址"
-      placeholder="请选择省市区"
+      :label="label"
+      :placeholder="placeholder"
       readonly
       is-link
       required
@@ -41,6 +41,16 @@ const props = defineProps({
       city_id: null,
       district_id: null
     })
+  },
+  // 标签文本
+  label: {
+    type: String,
+    default: '收货地址'
+  },
+  // 占位符
+  placeholder: {
+    type: String,
+    default: '请选择省市区'
   }
 })
 
@@ -226,17 +236,101 @@ function onConfirm({ selectedOptions }) {
 /**
  * 监听显示状态，打开时加载数据（移动端）
  */
-watch(showPicker, (newVal) => {
+watch(showPicker, async (newVal) => {
   if (newVal && provinces.value.length === 0) {
-    loadProvinces()
+    await loadProvinces()
+    // 如果有默认值，加载对应的城市和区县
+    if (props.modelValue.province_id) {
+      await loadInitialRegions()
+    }
   }
 })
 
 /**
+ * 监听 modelValue 变化，同步更新显示文本
+ */
+watch(() => props.modelValue, async (newVal) => {
+  if (newVal.province_id && newVal.city_id && newVal.district_id) {
+    await loadRegionNames(newVal)
+  } else {
+    selectedNames.value = {
+      province: '',
+      city: '',
+      district: ''
+    }
+  }
+}, { immediate: true, deep: true })
+
+/**
+ * 加载初始地区数据（用于默认值）
+ */
+async function loadInitialRegions() {
+  try {
+    const { province_id, city_id, district_id } = props.modelValue
+    
+    if (!province_id) return
+    
+    // 加载城市列表
+    await loadCities(province_id)
+    
+    if (!city_id) return
+    
+    // 加载区县列表
+    await loadDistricts(city_id)
+  } catch (error) {
+    console.error('加载初始地区失败:', error)
+  }
+}
+
+/**
+ * 根据ID加载地区名称
+ */
+async function loadRegionNames(region) {
+  try {
+    const { province_id, city_id, district_id } = region
+    
+    if (!province_id || !city_id || !district_id) {
+      return
+    }
+    
+    // 如果省份列表为空，先加载
+    if (provinces.value.length === 0) {
+      await loadProvinces()
+    }
+    
+    // 查找省份名称
+    const province = provinces.value.find(p => p.value === province_id)
+    if (!province) return
+    
+    // 加载城市列表
+    await loadCities(province_id)
+    const city = cities.value.find(c => c.value === city_id)
+    if (!city) return
+    
+    // 加载区县列表
+    await loadDistricts(city_id)
+    const district = districts.value.find(d => d.value === district_id)
+    if (!district) return
+    
+    // 更新显示名称
+    selectedNames.value = {
+      province: province.text,
+      city: city.text,
+      district: district.text
+    }
+  } catch (error) {
+    console.error('加载地区名称失败:', error)
+  }
+}
+
+/**
  * 组件挂载时初始化
  */
-onMounted(() => {
-  
+onMounted(async () => {
+  // 如果有默认值，加载地区名称
+  if (props.modelValue.province_id) {
+    await loadRegionNames(props.modelValue)
+  }
 })
 
 /**

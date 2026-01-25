@@ -172,9 +172,16 @@ import {
   getEnvironmentTypes
 } from '@/api/common'
 import PageTitle from '@/components/common/PageTitle.vue'
+import { useCompanyStore } from '@/stores/company'
 
 const router = useRouter()
 const formRef = ref(null)
+const companyStore = useCompanyStore()
+
+/**
+ * 公司信息
+ */
+const companyInfo = computed(() => companyStore.companyInfo)
 
 /**
  * 表单数据
@@ -267,6 +274,18 @@ const phoneRules = [
  * 初始化数据
  */
 onMounted(async () => {
+  // 填充默认地址（公司地址）
+  if (companyInfo.value?.company_address) {
+    formData.value.address = companyInfo.value.company_address
+  }
+  
+  // 填充默认省市区（浙江省 杭州市 西湖区）
+  regionValue.value = {
+    province_id: 330000,
+    city_id: 330100,
+    district_id: 330106
+  }
+  
   await Promise.all([
     loadBrands(),
     loadSpecifications(),
