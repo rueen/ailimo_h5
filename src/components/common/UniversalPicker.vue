@@ -95,7 +95,7 @@ const showPicker = ref(false)
  * 显示的文本（移动端）
  */
 const displayText = computed(() => {
-  if (!props.modelValue) return ''
+  if (props.modelValue == null) return '';
   
   const selected = props.columns.find(item => item.value === props.modelValue)
   return selected ? selected.text : ''
