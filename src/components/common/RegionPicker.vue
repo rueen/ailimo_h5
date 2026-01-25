@@ -70,6 +70,11 @@ const showPicker = ref(false)
 const loading = ref(false)
 
 /**
+ * 是否正在初始化
+ */
+const isInitializing = ref(false)
+
+/**
  * Picker 引用
  */
 const pickerRef = ref(null)
@@ -116,6 +121,9 @@ const regionText = computed(() => {
  * 加载省份列表
  */
 async function loadProvinces() {
+  // 如果已经有数据，不重复加载
+  if (provinces.value.length > 0) return
+  
   try {
     loading.value = true
     const data = await getRegions({ level: 1 })
@@ -123,11 +131,6 @@ async function loadProvinces() {
       text: item.name,
       value: item.id
     }))
-    
-    // 如果有省份数据，加载第一个省份的城市
-    if (provinces.value.length > 0) {
-      await loadCities(provinces.value[0].value)
-    }
   } catch (error) {
     console.error('加载省份列表失败:', error)
     showToast('加载省份列表失败')
@@ -141,20 +144,19 @@ async function loadProvinces() {
  * @param {number} provinceId - 省份ID
  */
 async function loadCities(provinceId) {
+  // 避免重复请求同一个省份的城市
+  if (cities.value.length > 0 && cities.value[0]?.parentId === provinceId) {
+    return
+  }
+  
   try {
     loading.value = true
     const data = await getRegions({ parent_id: provinceId, level: 2 })
     cities.value = (data || []).map(item => ({
       text: item.name,
-      value: item.id
+      value: item.id,
+      parentId: provinceId
     }))
-    
-    // 如果有城市数据，加载第一个城市的区县
-    if (cities.value.length > 0) {
-      await loadDistricts(cities.value[0].value)
-    } else {
-      districts.value = []
-    }
   } catch (error) {
     console.error('加载城市列表失败:', error)
     cities.value = []
@@ -169,12 +171,18 @@ async function loadCities(provinceId) {
  * @param {number} cityId - 城市ID
  */
 async function loadDistricts(cityId) {
+  // 避免重复请求同一个城市的区县
+  if (districts.value.length > 0 && districts.value[0]?.parentId === cityId) {
+    return
+  }
+  
   try {
     loading.value = true
     const data = await getRegions({ parent_id: cityId, level: 3 })
     districts.value = (data || []).map(item => ({
       text: item.name,
-      value: item.id
+      value: item.id,
+      parentId: cityId
     }))
   } catch (error) {
     console.error('加载区县列表失败:', error)
@@ -193,12 +201,19 @@ async function onChange({ columnIndex, selectedOptions }) {
     // 省份改变，重新加载城市和区县
     const province = selectedOptions[0]
     if (province && province.value) {
+      cities.value = []
+      districts.value = []
       await loadCities(province.value)
+      // 加载该省第一个城市的区县
+      if (cities.value.length > 0) {
+        await loadDistricts(cities.value[0].value)
+      }
     }
   } else if (columnIndex === 1) {
     // 城市改变，重新加载区县
     const city = selectedOptions[1]
     if (city && city.value) {
+      districts.value = []
       await loadDistricts(city.value)
     }
   }
@@ -239,9 +254,13 @@ function onConfirm({ selectedOptions }) {
 watch(showPicker, async (newVal) => {
   if (newVal && provinces.value.length === 0) {
     await loadProvinces()
-    // 如果有默认值，加载对应的城市和区县
-    if (props.modelValue.province_id) {
-      await loadInitialRegions()
+    
+    // 如果有默认值，加载对应的城市和区县（仅在打开选择器时）
+    if (props.modelValue.province_id && !isInitializing.value) {
+      await loadCities(props.modelValue.province_id)
+      if (props.modelValue.city_id) {
+        await loadDistricts(props.modelValue.city_id)
+      }
     }
   }
 })
@@ -251,7 +270,13 @@ watch(showPicker, async (newVal) => {
  */
 watch(() => props.modelValue, async (newVal) => {
   if (newVal.province_id && newVal.city_id && newVal.district_id) {
+    // 防止重复初始化
+    if (isInitializing.value) return
+    isInitializing.value = true
+    
     await loadRegionNames(newVal)
+    
+    isInitializing.value = false
   } else {
     selectedNames.value = {
       province: '',
@@ -260,27 +285,6 @@ watch(() => props.modelValue, async (newVal) => {
     }
   }
 }, { immediate: true, deep: true })
-
-/**
- * 加载初始地区数据（用于默认值）
- */
-async function loadInitialRegions() {
-  try {
-    const { province_id, city_id, district_id } = props.modelValue
-    
-    if (!province_id) return
-    
-    // 加载城市列表
-    await loadCities(province_id)
-    
-    if (!city_id) return
-    
-    // 加载区县列表
-    await loadDistricts(city_id)
-  } catch (error) {
-    console.error('加载初始地区失败:', error)
-  }
-}
 
 /**
  * 根据ID加载地区名称
@@ -302,13 +306,17 @@ async function loadRegionNames(region) {
     const province = provinces.value.find(p => p.value === province_id)
     if (!province) return
     
-    // 加载城市列表
-    await loadCities(province_id)
+    // 加载城市列表（仅在未加载或不匹配时）
+    if (cities.value.length === 0 || cities.value[0]?.parentId !== province_id) {
+      await loadCities(province_id)
+    }
     const city = cities.value.find(c => c.value === city_id)
     if (!city) return
     
-    // 加载区县列表
-    await loadDistricts(city_id)
+    // 加载区县列表（仅在未加载或不匹配时）
+    if (districts.value.length === 0 || districts.value[0]?.parentId !== city_id) {
+      await loadDistricts(city_id)
+    }
     const district = districts.value.find(d => d.value === district_id)
     if (!district) return
     
@@ -327,10 +335,7 @@ async function loadRegionNames(region) {
  * 组件挂载时初始化
  */
 onMounted(async () => {
-  // 如果有默认值，加载地区名称
-  if (props.modelValue.province_id) {
-    await loadRegionNames(props.modelValue)
-  }
+  // 默认值的处理已在 watch 中完成，此处不需要额外操作
 })
 
 /**
