@@ -103,25 +103,25 @@ const serviceList = [
   },
   {
     title: '笼位预约',
-    description: '提供短期和长期笼赁的实笼位预约服务',
+    description: '大小鼠饲养笼位预约',
     icon: 'https://ailimolab.oss-cn-hangzhou.aliyuncs.com/images/h5/cage.png',
     path: '/services/cage'
   },
   {
     title: '实验代操作',
-    description: '动物实验、称重、灌胃、代操作等，可提供时付费',
+    description: '常见动物实验代操作',
     icon: 'https://ailimolab.oss-cn-hangzhou.aliyuncs.com/images/h5/operation.png',
     path: '/services/experiment'
   },
   {
     title: '动物订购',
-    description: '优选实验动物，为优质康康提供更安全、快捷的品购服务',
+    description: '提供各大品牌优选实验动物',
     icon: 'https://ailimolab.oss-cn-hangzhou.aliyuncs.com/images/h5/animal.png',
     path: '/services/animal'
   },
   {
     title: '试剂耗材订购',
-    description: '品牌琳郎、种类齐全、价格、快速，可提供订购服务',
+    description: '可提供各类试剂耗材代购服务',
     icon: 'https://ailimolab.oss-cn-hangzhou.aliyuncs.com/images/h5/reagent.png',
     path: '/services/reagent'
   }
