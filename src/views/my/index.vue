@@ -2,7 +2,7 @@
  * @Author: diaochan diaochan@seatent.com
  * @Date: 2026-01-17 19:16:48
  * @LastEditors: diaochan diaochan@seatent.com
- * @LastEditTime: 2026-01-24 15:38:42
+ * @LastEditTime: 2026-01-25 11:16:51
  * @FilePath: /ailimo_h5/src/views/my/index.vue
  * @Description: 这是默认设置,请设置`customMade`, 打开koroFileHeader查看配置 进行设置: https://github.com/OBKoro1/koro1FileHeader/wiki/%E9%85%8D%E7%BD%AE
 -->
@@ -42,7 +42,7 @@
 
       <van-cell-group style="margin-top: 16px;">
         <van-cell title="我的订单" is-link @click="router.push('/orders')" />
-        <van-cell title="审核状态" is-link @click="router.push('/audit-status')" />
+        <!-- <van-cell title="审核状态" is-link @click="router.push('/audit-status')" /> -->
       </van-cell-group>
 
       <div class="logout-btn">
