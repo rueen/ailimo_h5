@@ -5,7 +5,7 @@
         <div class="footer-info">
           <div class="footer-logo">
             <img :src="logoUrl" alt="艾力默" />
-            <span>艾力默生物科技</span>
+            <span>{{ companyInfo.company_name }}</span>
           </div>
           <p class="footer-desc">专业的实验动物服务平台</p>
         </div>

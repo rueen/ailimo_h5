@@ -1,7 +1,15 @@
+<!--
+ * @Author: diaochan diaochan@seatent.com
+ * @Date: 2026-01-17 19:11:04
+ * @LastEditors: diaochan diaochan@seatent.com
+ * @LastEditTime: 2026-01-25 11:10:45
+ * @FilePath: /ailimo_h5/README.md
+ * @Description: 这是默认设置,请设置`customMade`, 打开koroFileHeader查看配置 进行设置: https://github.com/OBKoro1/koro1FileHeader/wiki/%E9%85%8D%E7%BD%AE
+-->
 # 艾力默用户端项目
 
 ## 项目简介
-艾力默生物科技用户端 H5 项目，提供设备预约、笼位预约、实验代操作、动物订购、试剂耗材订购等服务。
+浙江艾力默生物技术有限公司用户端 H5 项目，提供设备预约、笼位预约、实验代操作、动物订购、试剂耗材订购等服务。
 
 ## 技术栈
 - **框架**: Vue 3
