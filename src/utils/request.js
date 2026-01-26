@@ -136,4 +136,60 @@ request.interceptors.response.use(
   }
 )
 
+/**
+ * 用于获取二进制响应的 Axios 实例（如 xlsx 代理）
+ * 不走 JSON 响应拦截，直接返回 Blob
+ */
+const requestBlob = axios.create({
+  baseURL: import.meta.env.VITE_API_BASE_URL || '/api',
+  timeout: 20000,
+  responseType: 'blob'
+})
+
+requestBlob.interceptors.request.use(
+  (config) => {
+    const token = getToken()
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`
+    }
+    return config
+  },
+  (error) => Promise.reject(error)
+)
+
+requestBlob.interceptors.response.use(
+  (response) => {
+    if (response.status >= 200 && response.status < 300) {
+      return response.data
+    }
+    return Promise.reject(new Error(`请求失败: ${response.status}`))
+  },
+  async (error) => {
+    if (!error.response) {
+      showToast('网络连接失败，请检查网络')
+      return Promise.reject(error)
+    }
+    const { status, data } = error.response
+    if (status === 401) {
+      handle401()
+      return Promise.reject(error)
+    }
+    const contentType = error.response.headers?.['content-type'] || ''
+    if (contentType.includes('application/json')) {
+      try {
+        const text = await data.text()
+        const json = JSON.parse(text)
+        showToast(json.message || '请求失败')
+        return Promise.reject(new Error(json.message))
+      } catch {
+        showToast('请求失败')
+      }
+    } else {
+      showToast(data?.message || '请求失败')
+    }
+    return Promise.reject(error)
+  }
+)
+
+export { requestBlob }
 export default request

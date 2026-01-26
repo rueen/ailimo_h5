@@ -127,6 +127,12 @@ const routes = [
     name: 'OrderDetail',
     component: () => import('@/views/orders/detail.vue'),
     meta: { title: '订单详情', requiresAuth: true }
+  },
+  {
+    path: '/price',
+    name: 'Price',
+    component: () => import('@/views/price/index.vue'),
+    meta: { title: '收费标准', requiresAuth: false }
   }
 ]
 

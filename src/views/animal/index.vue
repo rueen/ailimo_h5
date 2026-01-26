@@ -3,6 +3,14 @@
     <div class="animal-page page-content">
       <page-title title="动物订购" @back="router.back()" />
       
+      <!-- 查看收费标准入口 -->
+      <div class="price-link-section">
+        <div class="price-link-section-text" @click="viewPrice">
+          <span>查看收费标准</span>
+          <van-icon name="arrow" />
+        </div>
+      </div>
+      
       <van-form @submit="handleSubmit" ref="formRef">
         <van-cell-group>
           <!-- 品牌 -->
@@ -386,6 +394,13 @@ function onBrandChange({ selectedOption }) {
   
   // 加载对应的品系
   loadVarietiesByBrand()
+}
+
+/**
+ * 查看收费标准
+ */
+function viewPrice() {
+  router.push('/price')
 }
 
 /**

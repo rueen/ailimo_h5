@@ -163,6 +163,7 @@ server {
 - [ ] GET /api/h5/cases - 获取案例列表
 - [ ] GET /api/h5/cases/:id - 获取案例详情
 - [ ] GET /api/h5/company-info - 获取公司信息
+- [ ] GET /api/h5/price-list - 获取收费标准 xlsx（后端代理 OSS 拉取，返回二进制，避免 CORS）
 
 ## 🐛 常见问题
 

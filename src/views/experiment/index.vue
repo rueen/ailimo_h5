@@ -3,6 +3,14 @@
     <div class="experiment-page page-content">
       <page-title title="实验代操作" @back="router.back()" />
       
+      <!-- 查看收费标准入口 -->
+      <div class="price-link-section">
+        <div class="price-link-section-text" @click="viewPrice">
+          <span>查看收费标准</span>
+          <van-icon name="arrow" />
+        </div>
+      </div>
+      
       <van-form @submit="handleSubmit" ref="formRef">
         <van-cell-group>
           <!-- 操作内容 -->
@@ -245,6 +253,13 @@ function resetDateTime() {
 }
 
 /**
+ * 查看收费标准
+ */
+function viewPrice() {
+  router.push('/price')
+}
+
+/**
  * 提交表单
  */
 async function handleSubmit() {
@@ -329,7 +344,7 @@ async function handleSubmit() {
 <style lang="less" scoped>
 .experiment-page {
   padding-top: @padding-md;
-  
+
   .time-picker-section {
     margin: @padding-lg 0;
     padding: @padding-md;

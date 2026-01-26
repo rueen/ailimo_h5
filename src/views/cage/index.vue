@@ -2,6 +2,15 @@
   <app-layout>
     <div class="cage-page page-content">
       <page-title title="笼位预约" @back="router.back()" />
+      
+      <!-- 查看收费标准入口 -->
+      <div class="price-link-section">
+        <div class="price-link-section-text" @click="viewPrice">
+          <span>查看收费标准</span>
+          <van-icon name="arrow" />
+        </div>
+      </div>
+      
       <van-form @submit="handleSubmit" ref="formRef">
         <van-cell-group>
           <!-- 动物类型 -->
@@ -240,6 +249,13 @@ const quantityRules = computed(() => [
     }
   }
 ])
+
+/**
+ * 查看收费标准
+ */
+function viewPrice() {
+  router.push('/price')
+}
 
 /**
  * 初始化数据
@@ -502,6 +518,8 @@ async function handleSubmit() {
 
 <style lang="less" scoped>
 .cage-page {
+  padding-top: @padding-md;
+  
   .submit-btn {
     margin-top: @padding-lg;
   }

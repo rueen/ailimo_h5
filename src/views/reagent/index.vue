@@ -3,6 +3,14 @@
     <div class="reagent-page page-content">
       <page-title title="试剂耗材订购" @back="router.back()" />
       
+      <!-- 查看收费标准入口 -->
+      <div class="price-link-section">
+        <div class="price-link-section-text" @click="viewPrice">
+          <span>查看收费标准</span>
+          <van-icon name="arrow" />
+        </div>
+      </div>
+      
       <van-form @submit="handleSubmit" ref="formRef">
         <van-cell-group>
           <!-- 试剂耗材名称 -->
@@ -201,6 +209,13 @@ const phoneRules = [
     }
   }
 ]
+
+/**
+ * 查看收费标准
+ */
+function viewPrice() {
+  router.push('/price')
+}
 
 /**
  * 初始化数据
