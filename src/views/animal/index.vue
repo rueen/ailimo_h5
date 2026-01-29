@@ -74,6 +74,16 @@
             :rules="[{ required: true, message: '请选择要求' }]"
           />
           
+          <!-- 数量 -->
+          <van-field
+            v-model="formData.quantity"
+            type="number"
+            label="数量"
+            placeholder="请输入数量"
+            required
+            :rules="quantityRules"
+          />
+          
           <!-- 是否打耳标 -->
           <van-cell title="是否打耳标">
             <template #value>
@@ -192,6 +202,7 @@ const formData = ref({
   variety_id: null,
   specification_id: null,
   gender: 2, // 默认不限
+  quantity: '',
   supervisor_name: '',
   orderer_name: '',
   contact_phone: '',
@@ -265,6 +276,22 @@ const phoneRules = [
     validator: (val) => {
       if (!/^1[3-9]\d{9}$/.test(val)) {
         return '请输入正确的手机号'
+      }
+      return true
+    }
+  }
+]
+
+/**
+ * 数量校验规则
+ */
+const quantityRules = [
+  { required: true, message: '请输入数量' },
+  { 
+    validator: (val) => {
+      const n = Number(val)
+      if (!val || isNaN(n) || n <= 0) {
+        return '数量必须大于 0'
       }
       return true
     }
@@ -433,6 +460,7 @@ async function handleSubmit() {
       variety_id: formData.value.variety_id,
       specification_id: formData.value.specification_id,
       gender: formData.value.gender,
+      quantity: Number(formData.value.quantity),
       supervisor_name: formData.value.supervisor_name,
       orderer_name: formData.value.orderer_name,
       contact_phone: formData.value.contact_phone,

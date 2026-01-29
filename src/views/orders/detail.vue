@@ -117,6 +117,7 @@
               <van-cell title="性别" :value="orderDetail.gender_text" />
               <van-cell title="环境" :value="orderDetail.environment?.name" />
               <van-cell title="要求" :value="orderDetail.requirement?.name" />
+              <van-cell v-if="orderDetail.quantity != null" title="数量" :value="`${orderDetail.quantity}`" />
               <van-cell title="是否打耳标" :value="getNeedEarTagText(orderDetail.need_ear_tag)" />
               <van-cell v-if="orderDetail.remark" title="备注" :value="orderDetail.remark" />
             </van-cell-group>
