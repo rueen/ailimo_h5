@@ -36,6 +36,19 @@
             @change="onEnvironmentChange"
           />
           
+          <!-- 房间 -->
+          <universal-picker
+            v-if="formData.animal_type_id && formData.environment_id"
+            v-model="formData.room_id"
+            :columns="roomOptions"
+            label="房间"
+            placeholder="请选择房间"
+            required
+            :loading="loadingRooms"
+            :rules="[{ required: true, message: '请选择房间' }]"
+            @change="onRoomChange"
+          />
+          
           <!-- 笼位用途 -->
           <universal-picker
             v-model="formData.purpose_id"
@@ -58,7 +71,7 @@
           />
           
           <!-- 日期选择区域 -->
-          <div v-if="formData.animal_type_id && formData.environment_id" class="date-picker-section">
+          <div v-if="formData.animal_type_id && formData.environment_id && formData.room_id" class="date-picker-section">
             <!-- 开始日期 -->
             <universal-date-picker
               v-model="formData.start_date"
@@ -138,6 +151,7 @@ import UniversalPicker from '@/components/common/UniversalPicker.vue'
 import UniversalDatePicker from '@/components/common/UniversalDatePicker.vue'
 import { 
   getEnvironmentsByAnimalType,
+  getRoomsByAnimalTypeAndEnvironment,
   getCageAvailableQuantity,
   createCageOrder 
 } from '@/api/cage'
@@ -156,6 +170,7 @@ const formRef = ref(null)
 const formData = ref({
   animal_type_id: null,
   environment_id: null,
+  room_id: null,
   start_date: '',
   end_date: '',
   quantity: '',
@@ -177,6 +192,16 @@ const environmentOptions = ref([])
  * 笼位用途选项
  */
 const purposeOptions = ref([])
+
+/**
+ * 房间选项
+ */
+const roomOptions = ref([])
+
+/**
+ * 房间加载状态
+ */
+const loadingRooms = ref(false)
 
 /**
  * 提交状态
@@ -271,7 +296,7 @@ onMounted(async () => {
  * 监听日期变化，查询可用数量
  */
 watch(
-  () => [formData.value.animal_type_id, formData.value.environment_id, formData.value.start_date, formData.value.end_date, isLongTerm.value],
+  () => [formData.value.animal_type_id, formData.value.environment_id, formData.value.room_id, formData.value.start_date, formData.value.end_date, isLongTerm.value],
   () => {
     // 清空旧的防抖定时器
     if (debounceTimer) {
@@ -363,9 +388,47 @@ async function loadEnvironmentsByAnimalType() {
 /**
  * 环境类型改变事件
  */
-function onEnvironmentChange({ selectedOption }) {
-  // 清空日期和数量
+function onEnvironmentChange() {
+  // 清空房间、日期和数量
+  formData.value.room_id = null
+  roomOptions.value = []
   resetDateTime()
+  loadRooms()
+}
+
+/**
+ * 房间改变事件
+ */
+function onRoomChange() {
+  // 清空日期和数量（可用数量依赖房间）
+  resetDateTime()
+}
+
+/**
+ * 根据动物类型和环境类型加载房间列表
+ */
+async function loadRooms() {
+  if (!formData.value.animal_type_id || !formData.value.environment_id) {
+    roomOptions.value = []
+    return
+  }
+  try {
+    loadingRooms.value = true
+    const data = await getRoomsByAnimalTypeAndEnvironment({
+      animal_type_id: formData.value.animal_type_id,
+      environment_id: formData.value.environment_id
+    })
+    roomOptions.value = (data || []).map(item => ({
+      text: item.name,
+      value: item.id
+    }))
+  } catch (error) {
+    console.error('加载房间列表失败:', error)
+    roomOptions.value = []
+    showToast('加载房间列表失败')
+  } finally {
+    loadingRooms.value = false
+  }
 }
 
 /**
@@ -382,8 +445,8 @@ function onLongTermChange(checked) {
  * 查询可用数量
  */
 async function fetchAvailableQuantity() {
-  // 必须选择动物类型、环境类型和开始日期
-  if (!formData.value.animal_type_id || !formData.value.environment_id || !formData.value.start_date) {
+  // 必须选择动物类型、环境类型、房间和开始日期
+  if (!formData.value.animal_type_id || !formData.value.environment_id || !formData.value.room_id || !formData.value.start_date) {
     availableQuantity.value = null
     return
   }
@@ -400,6 +463,7 @@ async function fetchAvailableQuantity() {
     const params = {
       animal_type_id: formData.value.animal_type_id,
       environment_id: formData.value.environment_id,
+      room_id: formData.value.room_id,
       start_date: formData.value.start_date
     }
     
@@ -428,7 +492,9 @@ async function fetchAvailableQuantity() {
  */
 function resetFromEnvironment() {
   formData.value.environment_id = null
+  formData.value.room_id = null
   environmentOptions.value = []
+  roomOptions.value = []
   resetDateTime()
 }
 
@@ -489,6 +555,7 @@ async function handleSubmit() {
     const submitData = {
       animal_type_id: formData.value.animal_type_id,
       environment_id: formData.value.environment_id,
+      room_id: formData.value.room_id,
       quantity: Number(formData.value.quantity),
       purpose_id: formData.value.purpose_id,
       start_date: formData.value.start_date,

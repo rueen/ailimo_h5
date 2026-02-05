@@ -18,7 +18,7 @@
             <van-cell title="订单编号">
               <template #value>
                 <div class="order-sn-cell">
-                  <span>#{{ orderDetail.order_sn }}</span>
+                  <span>{{ orderDetail.order_sn }}</span>
                   <van-button
                     size="mini"
                     type="primary"
@@ -62,6 +62,7 @@
             <van-cell-group>
               <van-cell title="动物类型" :value="orderDetail.animal_type?.name" />
               <van-cell title="环境类型" :value="orderDetail.environment?.name" />
+              <van-cell v-if="orderDetail.room?.name" title="房间" :value="orderDetail.room.name" />
               <van-cell title="笼位数量" :value="`${orderDetail.quantity} 个`" />
               <van-cell title="用途" :value="orderDetail.purpose?.name" />
               <van-cell v-if="orderDetail.remark" title="备注" :value="orderDetail.remark" />
